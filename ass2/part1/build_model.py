@@ -32,66 +32,8 @@ def bias_variable(shape,name,layer):
     #with tf.variable_scope(name):
     return tf.get_variable("biais_" + layer, shape, initializer=initializer)
 
-
-"""
-# Dictionary of weights
-OneLinear_weights = {
-    "W": weight_variable([IMAGE_SIZE*IMAGE_SIZE, NUM_LABELS]),
-    "b": bias_variable([NUM_LABELS])
-}
-fully_connected_neurons1 = 128
-OneHidden_weights = {
-    "W1": weight_variable([IMAGE_SIZE*IMAGE_SIZE, fully_connected_neurons1]),
-    "b1": bias_variable([fully_connected_neurons1]),
-    "W2": weight_variable([fully_connected_neurons1, NUM_LABELS]),
-    "b2": bias_variable([NUM_LABELS])
-}
-fully_connected_neurons2 = 256
-TwoHidden_weights = {
-    "W1": weight_variable([IMAGE_SIZE*IMAGE_SIZE, fully_connected_neurons2]),
-    "b1": bias_variable([fully_connected_neurons2]),
-    "W2": weight_variable([fully_connected_neurons2, fully_connected_neurons2]),
-    "b2": bias_variable([fully_connected_neurons2]),
-    "W3": weight_variable([fully_connected_neurons2, NUM_LABELS]),
-    "b3": bias_variable([NUM_LABELS])
-}
-size_filters = 3
-num_filters = 32
-fully_connected_neurons3 = 256
-Conv1_weights = {
-    "Wconv1": weight_variable([size_filters,size_filters, NUM_CHANNELS, num_filters]),
-    "bconv1": bias_variable([num_filters]),
-    "Wconv2": weight_variable([size_filters,size_filters,num_filters,num_filters]),
-    "bconv2": bias_variable([num_filters]),
-    "Wdense1": weight_variable([int(IMAGE_SIZE/4*IMAGE_SIZE/4*num_filters), fully_connected_neurons3]),
-    "bdense1": bias_variable([fully_connected_neurons3]),
-    "Wdense2": weight_variable([fully_connected_neurons3, NUM_LABELS]),
-    "bdense2": bias_variable([NUM_LABELS])
-}
-conv_weights = {
-    "Wconv1": weight_variable([size_filters,size_filters, NUM_CHANNELS, num_filters]),
-    "bconv1": bias_variable([num_filters]),
-    "Wconv2": weight_variable([size_filters,size_filters,num_filters,2*num_filters]),
-    "bconv2": bias_variable([2*num_filters]),
-    "Wdense1": weight_variable([int(IMAGE_SIZE/4*IMAGE_SIZE/4*2*num_filters), fully_connected_neurons3]),
-    "bdense1": bias_variable([fully_connected_neurons3]),
-    "Wdense2": weight_variable([fully_connected_neurons3, NUM_LABELS]),
-    "bdense2": bias_variable([NUM_LABELS])
-}
-"""
-
 def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
     #with tf.variable_scope('RNN') as scope:
-        """
-        # Weigth for linear transformation
-        weight_embedding = weight_variable([IMAGE_SIZE*IMAGE_SIZE,nunits])
-        biais_embedding = bias_variable([nunits])
-        weight_embedding_tile = tf.tile(weight_embedding,[1,IMAGE_SIZE*IMAGE_SIZE])
-        biais_embedding_tile = tf.tile(biais_embedding,[IMAGE_SIZE*IMAGE_SIZE])
-        images_embedded = tf.matmul(x,weight_embedding_tile) #+ biais_embedding_tile
-        imshape = images_embedded.get_shape().as_list()
-        images_embedded = tf.reshape(images_embedded, [imshape[0],IMAGE_SIZE*IMAGE_SIZE,nunits]) # shape [batch_size,IMAGE_SIZE * IMAGE_SIZE,nunits]
-        """
         imshape = x.get_shape().as_list()
         images_embedded = tf.reshape(x, [imshape[0],imshape[1],1]) # shape [batch_size,IMAGE_SIZE * IMAGE_SIZE,1]
 

@@ -137,4 +137,4 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, training=False)
 
     # out_logits is list of lenth 300 of output logits [10*batch,1]
     # out_predictions is list of lenth 300 of predicted pixels [10*batch,1]
-    return out_logits[:-1], out_predictions[:-1]
+    return out_logits, out_predictions

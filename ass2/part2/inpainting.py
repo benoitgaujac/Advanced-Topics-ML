@@ -31,19 +31,6 @@ def get_cache_data_set(data,nsample=nsample):
     return samples[:,:-300]
 
 ######################################## Utils functions ########################################
-def accuracy(predictions,labels):
-    correct_prediction = (np.argmax(predictions, 1)==labels)
-    return np.mean(correct_prediction)
-
-def accuracy_logistic(predictions,labels):
-    #pred_int = tf.to_int32(tf.rint(predictions))
-    #lab_int = tf.to_int32(labels)
-    pred_int = np.rint(predictions).astype(np.int32)
-    lab_int = labels.astype(np.int32)
-    correct_prediction = (pred_int==lab_int)
-    #pdb.set_trace()
-    return np.mean(correct_prediction)
-
 def get_loss(logits,targets,targets_GT=False):
     """
     logits: list of logits: 299x[10*nbsample,1]
@@ -87,7 +74,6 @@ def in_painting(model_archi,data,nsample=100):
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
         tf.global_variables_initializer().run()
-
         csvfileTest = open('Perf/Val_' + str(nn_model) + '.csv', 'w')
         Testwriter = csv.writer(csvfileTest, delimiter=';',)
         Testwriter.writerow(['Predict CE','Grount truth CE'])
@@ -104,30 +90,3 @@ def in_painting(model_archi,data,nsample=100):
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Predict Xent: {:.4f}, Ground truth Xent: {:.4f}".format(prediction_XE,GroundTruth_XE))
         Testwriter.writerow([rediction_XE,GroundTruth_XE])
-
-
-if __name__ == '__main__':
-    ###### Load and get data ######
-    train_data, _, validation_data, _, test_data, _ = get_data()
-    # Reshape data
-    train_data = np.reshape(train_data,[-1,IMAGE_SIZE*IMAGE_SIZE])
-    validation_data = np.reshape(validation_data,[-1,IMAGE_SIZE*IMAGE_SIZE])
-    test_data = np.reshape(test_data,[-1,IMAGE_SIZE*IMAGE_SIZE])
-    # Convert to binary
-    print("Converting data to binary")
-    train_data = binarize(train_data)
-    validation_data = binarize(validation_data)
-    test_data = binarize(test_data)
-    # Shuffle train data
-    np.random.shuffle(train_data)
-
-    train_data = train_data[:2000]
-    #validation_data = validation_data[:2000]
-
-    options, arguments = parser.parse_args(sys.argv)
-    # run for model
-    if options.model not in models:
-        for model_ in models.keys():
-            main(models[model_],train_data, validation_data, test_data, options.mode)
-    else:
-        main(models[options.model],train_data, validation_data, test_data, options.mode)

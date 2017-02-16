@@ -188,7 +188,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
     ###### CLearning rate decay ######
     learning_rate = tf.train.exponential_decay(
-                    0.0008,                # Base learning rate.
+                    0.001,                # Base learning rate.
                     batch * BATCH_SIZE,  # Current index into the dataset.
                     5*train_size,          # Decay step.
                     0.97,                # Decay rate.
@@ -251,7 +251,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     train_loss += l / n_step
                     train_acc += accuracy(predictions,batch_labels) / n_step
                 # Print info for previous epoch
-                print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
+                print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 #print("Epoch loss: {:.4f}, Epoch acc: {:.3f}%, Epoch err: {:.3f}%".format(train_loss,train_acc*100, 100 - train_acc*100))
                 if train_acc>best_train_acc:
                     best_train_acc = train_acc
@@ -312,8 +312,8 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    train_data = train_data[:10000]
-    train_labels = train_labels[:10000]
+    train_data = train_data[:5000]
+    train_labels = train_labels[:5000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
