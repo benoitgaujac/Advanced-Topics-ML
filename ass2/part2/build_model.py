@@ -18,7 +18,7 @@ keep_prob = .7
 
 ######################################## Utils functions ########################################
 # Sample pixel values from logits
-def get_samples(logits,last_known=false):
+def get_samples(logits,last_known=False):
     logits_shape = logits.get_shape().as_list()
     # if output from last known pixel, we want 10 samples
     # otherwise, we just want 1 sample from sample pixel
@@ -114,8 +114,7 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, training=False)
         last_out = tf.matmul(last_out,weight_class) + biais_class # last_out shape: [batch, 1]
         # sample 10 value given last output
         inputs = get_samples(last_out,last_known=True) # inputs shape [10*batch,1,1]
-        # tile firt logits for cross entropy
-        out = tf.tile(out,[0,10]) # out shape [batch,10]
+        out = tf.tile(out,[1,10]) # out shape [batch,10]
         out = tf.reshape(out,[-1,1]) # out shape [10*batch,1]
         # list of pixels predictions and pixels logits
         out_predictions = [inputs,]

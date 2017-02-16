@@ -22,10 +22,10 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 512
+BATCH_SIZE = 256
 
-num_epochs = 11
-epochs_per_checkpoint = 5
+num_epochs = 50
+epochs_per_checkpoint = 2
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -35,14 +35,14 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32}
-lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64}
-lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128}
-lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.001}
+lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0005}
+lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0001}
+lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.001}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0005}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0001}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.001}
 models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
         "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
         "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
@@ -188,10 +188,10 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
     ###### CLearning rate decay ######
     learning_rate = tf.train.exponential_decay(
-                    0.001,                # Base learning rate.
-                    batch * BATCH_SIZE,  # Current index into the dataset.
-                    5*train_size,          # Decay step.
-                    0.97,                # Decay rate.
+                    model_archi["init_learning_rate"],  # Base learning rate.
+                    batch * BATCH_SIZE,                 # Current index into the dataset.
+                    5*train_size,                       # Decay step.
+                    0.99,                               # Decay rate.
                     staircase=True)
 
     ###### Optimizer ######
@@ -280,10 +280,10 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                     1 - train_acc, train_acc, 1 - eval_acc, eval_acc])
         # Testing
         #if mode_=="test":
-        WORK_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
-        if not tf.gfile.Exists(WORK_DIRECTORY):
+        WEIGHTS_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
+        if not tf.gfile.Exists(WEIGHTS_DIRECTORY):
             raise Exception("no weights given")
-        saver.restore(sess, WORK_DIRECTORY)
+        saver.restore(sess, WEIGHTS_DIRECTORY)
 
         scope.reuse_variables()
         # Compute and print results once training is done
@@ -312,8 +312,8 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    train_data = train_data[:5000]
-    train_labels = train_labels[:5000]
+    #train_data = train_data[:6000]
+    #train_labels = train_labels[:6000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model

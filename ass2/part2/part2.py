@@ -21,8 +21,8 @@ VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 128
 
-num_epochs = 11
-epochs_per_checkpoint = 5
+num_epochs = 21
+epochs_per_checkpoint = 10
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -257,10 +257,10 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 # Writing csv file with results and saving models
                 Trainwriter.writerow([epoch + 1, time.time() - start_time, train_loss, eval_loss])
         # Testing
-        WORK_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
-        if not tf.gfile.Exists(WORK_DIRECTORY):
+        WEIGHTS_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
+        if not tf.gfile.Exists(WEIGHTS_DIRECTORY):
             raise Exception("no weights given")
-        saver.restore(sess, WORK_DIRECTORY)
+        saver.restore(sess, WEIGHTS_DIRECTORY)
         scope.reuse_variables()
         # Compute and print results once training is done
         tst_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:2000]
+    train_data = train_data[:5000]
     #validation_data = validation_data[:2000]
 
     options, arguments = parser.parse_args(sys.argv)
