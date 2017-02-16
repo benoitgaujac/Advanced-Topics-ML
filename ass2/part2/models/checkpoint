@@ -1,2 +1,2 @@
-model_checkpoint_path: "model_gru1l64u.ckpt"
-all_model_checkpoint_paths: "model_gru1l64u.ckpt"
+model_checkpoint_path: "model_gru3l32u.ckpt"
+all_model_checkpoint_paths: "model_gru3l32u.ckpt"

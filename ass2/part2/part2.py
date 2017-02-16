@@ -8,6 +8,7 @@ import numpy as np
 from six.moves import urllib
 import tensorflow as tf
 import build_model
+import inpainting
 import csv
 from sklearn.utils import shuffle
 
@@ -261,7 +262,10 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
         if not tf.gfile.Exists(WEIGHTS_DIRECTORY):
             raise Exception("no weights given")
         saver.restore(sess, WEIGHTS_DIRECTORY)
-        scope.reuse_variables()
+        vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+        name_vars = [v.name for v in vars_]
+        pdb.set_trace()
+
         # Compute and print results once training is done
         tst_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={
                                                         test_data_node: test_data,})
@@ -297,7 +301,12 @@ if __name__ == '__main__':
                 main(models[model_],train_data, validation_data, test_data, options.mode)
         else:
             main(models[options.model],train_data, validation_data, test_data, options.mode)
-    elif option.mode=="inpainting":
-        sfve
+    elif options.mode=="inpainting":
+        # run for model
+        if options.model not in models:
+            for model_ in models.keys():
+                inpainting.in_painting(models[model_],test_data,10)
+        else:
+            inpainting.in_painting(models[options.model],test_data)
     else:
         raise Exception("mode must be train, test or inpainting")

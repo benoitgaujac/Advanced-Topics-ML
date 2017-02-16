@@ -18,7 +18,7 @@ keep_prob = .7
 
 ######################################## Utils functions ########################################
 # Sample pixel values from logits
-def get_samples(logits,last_known=False):
+def get_samples(logits,nsamples,last_known=False):
     logits_shape = logits.get_shape().as_list()
     # if output from last known pixel, we want 10 samples
     # otherwise, we just want 1 sample from sample pixel
@@ -28,14 +28,13 @@ def get_samples(logits,last_known=False):
         nsample = 1
     # get log proba
     sig = tf.sigmoid(logits)
-    sig_shape = sig.get_shape().as_list()
-    # formating for tf.multinomial
-    sig_ = tf.zeros([sig_shape[0],2])
-    sig_[:,0] = sig
-    sig_[:1] = 1 - sig
+    ones = tf.ones_like(sig,dtype=data_type())
+    sig_ = tf.subtract(ones,sig)
+    proba = tf.stack([sig,sig_],axis=1)
+    proba = tf.reshape(proba,[-1,2])
     # sampling
-    samples = tf.multinomial(sig_, nsamples, seed=SEED)
-    return tf.reshape(samples,[-1,1,1]) # reshaping to [10*batch,1,1]
+    samples = tf.multinomial(proba, nsamples, seed=SEED)
+    return tf.to_float(tf.reshape(samples,[-1,1,1])) # reshaping to [10*batch,1,1]
 
 ######################################## Model ########################################
 def weight_variable(shape,name,layer):
@@ -78,7 +77,7 @@ def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
     #pdb.set_trace()
     return y_reshape[:,:-1]
 
-def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
+def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, training=False):
     imshape = x.get_shape().as_list()
     images_embedded = tf.reshape(x, [imshape[0],imshape[1],1]) # shape [batch_size,IMAGE_SIZE * IMAGE_SIZE,1]
     #pdb.set_trace()
@@ -101,39 +100,37 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, training=False)
     # Build RNN network
     seq_lent = imshape[1]*imshape[1] * np.ones([imshape[0]])
     with tf.variable_scope(name) as scope:
-        scope.reuse_variables()
         # Weights for classification layer
         weight_class = weight_variable([nunits,NUM_LABELS],name,"class")
         biais_class = bias_variable([NUM_LABELS],name,"class")
         # Get state and ouputs up to the last visible pixel
         outputs, state = tf.nn.dynamic_rnn(cells, images_embedded,  # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
                                                 dtype=data_type(),
-                                                sequence_length=seq_lent,
-                                                scope=scope)
+                                                sequence_length=seq_lent)
         last_out = outputs[:,-1,:] # last_out shape: [batch, nunits]
         last_out = tf.matmul(last_out,weight_class) + biais_class # last_out shape: [batch, 1]
         # sample 10 value given last output
-        inputs = get_samples(last_out,last_known=True) # inputs shape [10*batch,1,1]
-        out = tf.tile(out,[1,10]) # out shape [batch,10]
+        inputs = get_samples(last_out,nsamples,last_known=True) # inputs shape [10*batch,1,1]
+        out = tf.tile(last_out,[1,nsamples]) # out shape [batch,10]
         out = tf.reshape(out,[-1,1]) # out shape [10*batch,1]
         # list of pixels predictions and pixels logits
-        out_predictions = [inputs,]
+        out_predictions = [tf.reshape(inputs,[-1,1]),]
         out_logits = [out,]
         # run the RNN throught the hidden 300 last pixels
         inputs_shape = inputs.get_shape().as_list()
         seq_lent = np.ones([inputs_shape[0]])
+        scope.reuse_variables()
         for i in range(300):
             out, state = tf.nn.dynamic_rnn(cells, inputs,  # out shape [10*batch,1,nunits]
                                         dtype=data_type(),
                                         sequence_length=seq_lent,
-                                        scope=scope,
                                         initial_state=state)
             out = tf.reshape(out,[-1,nunits]) # out shape [10*batch,nunits]
             out = tf.matmul(out,weight_class) + biais_class # out shape: [10*batch,1]
             out_logits.append(out)
-            inputs = get_samples(out) # inputs shape [10*batch,1,1]
+            inputs = get_samples(out,nsamples) # inputs shape [10*batch,1,1]
             out_predictions.append(tf.reshape(inputs,[-1,1])) # prediction shape: [10*batch,1]
 
     # out_logits is list of lenth 300 of output logits [10*batch,1]
     # out_predictions is list of lenth 300 of predicted pixels [10*batch,1]
-    return out_logits, out_predictions
+    return out_logits[:-1], out_predictions[:-1]

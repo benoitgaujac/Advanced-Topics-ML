@@ -17,10 +17,10 @@ import part2
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
 SEED = 66478  # Set to None for random seed.
-
+nsamples = 1
 
 ######################################## Data processing ########################################
-def get_cache_data_set(data,nsample=nsample):
+def get_cache_data_set(data,nsample=100):
     data_shape = np.shape(data)
     idx = np.random.randint(0,data_shape[0],nsample)
     samples = data[idx]
@@ -35,14 +35,14 @@ def get_loss(logits,targets,targets_GT=False):
         - if targets_GT False: list of predicted pixels 300x[10*nbsample,1]
     """
     # Reshapping logits
-    log = tf.stack(logits,axe=0) # log shape: [299,10*nbsample,1]
+    log = tf.stack(logits,axis=0) # log shape: [299,10*nbsample,1]
     log = tf.reshape(tf.transpose(log,perm=[1,0,2]),[-1,300]) # log shape: [10*nbsample,299]
     # Reshapping targets
     if not targets_GT:
-        tar = tf.stack(targets,axe=0) # tar shape: [299,10*nbsample,1]
+        tar = tf.stack(targets,axis=0) # tar shape: [299,10*nbsample,1]
         tar = tf.reshape(tf.transpose(tar,perm=[1,0,2]),[-1,300]) # tar shape: [10*nbsample,299]
     elif targets_GT:
-        tar = tf.tile(targets,[1,10]) # tar shape: [nbsample,299*10]
+        tar = tf.tile(targets,[1,nsamples]) # tar shape: [nbsample,299*10]
         tar = tf.reshape(tar,[-1,300]) # tar shape: [10*nbsample,299]
     loss_300 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log))
     loss_28 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar[:,:28],logits=log[:,:28]))
@@ -56,15 +56,18 @@ def inpaint_images(data, idx, predictions, npixels):
     # Original
     original_data = data[idx] #shape: [nbsamples, 28x28]
     original_data_tostack = np.reshape(original_data,[-1,data_shape[1],1])
+    pdb.set_trace()
     # Cache data with ones
     cache_data = np.ones_like(orginal_data) #shape: [nbsamples, 28x28]
     cache_data[:,:-300] = original_data[:,-300] #shape: [nbsamples, 28x28]
     cache_data_tostack = np.reshape(cache_data,[-1,data_shape[1],1])
+    pdb.set_trace()
     # prediction (10 samples)
     preds = tf.stack(predictions,axe=0) #shape: [300, 10xnbsamples]
     preds = tf.reshape(preds,[300,data_shape[0],-1]) #shape: [300, nbsamples, 10]
     preds = tf.transpose(preds,perm=[1,0,2]) #shape: [nbsamples, 300, 10]
     preds_shape = preds.get_shape()
+    pdb.set_trace()
     mask = np.ones([preds_shape[0],preds_shape[1]-npixels,preds_shape[1]]) #shape: [nbsamples, 300-npixels, 10]
     preds[:,npixels:,:] = mask #shape: [nbsamples, 300, 10]
     list_ = [original_data for _ in range(10)] #shape: 10 x [nbsamples, 28x28]
@@ -95,7 +98,6 @@ def save_images(images,NB_PIX):
             plt.axis("off")
             fig.savefig(DIR)
             plt.close()
-                
 
 ######################################## Main ########################################
 def in_painting(model_archi,data,nsample=100):
@@ -104,7 +106,7 @@ def in_painting(model_archi,data,nsample=100):
 
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
-    test_data_node = tf.placeholder(dtype = data_type(), shape=(nsample, np.shape(cache_data)[1]))
+    test_data_node = tf.placeholder(dtype = part2.data_type(), shape=(nsample, np.shape(cache_data)[1]))
 
     ###### Build model and loss ######
     test_logits, test_pred = build_model.model_inpainting(test_data_node,
@@ -112,9 +114,16 @@ def in_painting(model_archi,data,nsample=100):
                                                             cell=model_archi["cell"],
                                                             nlayers=model_archi["layers"],
                                                             nunits=model_archi["units"],
+                                                            nsamples=nsamples,
                                                             training=False)
-    grtr_cross_entropy = get_loss(logits=test_logits,targets=test_data_node[:,1:],targets_GT=True)
+    grtr_cross_entropy = get_loss(logits=test_logits,targets=test_data_node[:,-300:],targets_GT=True)
     pred_cross_entropy = get_loss(logits=test_logits,targets=test_pred)
+
+    saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
+    #vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    #name_vars = [v.name for v in vars_]
+    #pdb.set_trace()
+
 
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
@@ -130,6 +139,7 @@ def in_painting(model_archi,data,nsample=100):
         if not tf.gfile.Exists(WORK_DIRECTORY):
             raise Exception("no weights given")
         saver.restore(sess, WORK_DIRECTORY)
+        pdb.set_trace()
 
         # Compute and print results once training is done
         prediction_XE, GroundTruth_XE = sess.run([grtr_cross_entropy, pred_cross_entropy],
