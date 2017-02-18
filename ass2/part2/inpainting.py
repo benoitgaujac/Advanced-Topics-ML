@@ -17,7 +17,7 @@ import part2
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
 SEED = 66478  # Set to None for random seed.
-nsamples = 1
+nsamples = 3
 
 ######################################## Data processing ########################################
 def get_cache_data_set(data,nsample=100):
@@ -29,21 +29,21 @@ def get_cache_data_set(data,nsample=100):
 ######################################## Utils functions ########################################
 def get_loss(logits,targets,targets_GT=False):
     """
-    logits: list of logits: 300x[10*nbsample,1]
+    logits: list of logits: 300x[nsamples*nbsample,1]
     targets: targets pixels:
         - if targets_GT True: tensor of GT pixels [nbsample,300]
-        - if targets_GT False: list of predicted pixels 300x[10*nbsample,1]
+        - if targets_GT False: list of predicted pixels 300x[nsamples*nbsample,1]
     """
     # Reshapping logits
-    log = tf.stack(logits,axis=0) # log shape: [299,10*nbsample,1]
-    log = tf.reshape(tf.transpose(log,perm=[1,0,2]),[-1,300]) # log shape: [10*nbsample,299]
+    log = tf.stack(logits,axis=0) # log shape: [299,nsamples*nbsample,1]
+    log = tf.reshape(tf.transpose(log,perm=[1,0,2]),[-1,300]) # log shape: [nsamples*nbsample,299]
     # Reshapping targets
     if not targets_GT:
-        tar = tf.stack(targets,axis=0) # tar shape: [299,10*nbsample,1]
-        tar = tf.reshape(tf.transpose(tar,perm=[1,0,2]),[-1,300]) # tar shape: [10*nbsample,299]
+        tar = tf.stack(targets,axis=0) # tar shape: [299,nsamples*nbsample,1]
+        tar = tf.reshape(tf.transpose(tar,perm=[1,0,2]),[-1,300]) # tar shape: [nsamples*nbsample,299]
     elif targets_GT:
-        tar = tf.tile(targets,[1,nsamples]) # tar shape: [nbsample,299*10]
-        tar = tf.reshape(tar,[-1,300]) # tar shape: [10*nbsample,299]
+        tar = tf.tile(targets,[1,nsamples]) # tar shape: [nbsample,299*nsamples]
+        tar = tf.reshape(tar,[-1,300]) # tar shape: [nsamples*nbsample,299]
     loss_300 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log))
     loss_28 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar[:,:28],logits=log[:,:28]))
     loss_10 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar[:,:10],logits=log[:,:10]))
@@ -52,64 +52,96 @@ def get_loss(logits,targets,targets_GT=False):
     return [loss_300, loss_28, loss_10, loss_1]
 
 def inpaint_images(data, idx, predictions, npixels):
-    data_shape = orginal_data.get_shape()
+    data_shape = np.shape(data)
+    nbtodraw = np.shape(idx)[0]
     # Original
-    original_data = data[idx] #shape: [nbsamples, 28x28]
-    original_data_tostack = np.reshape(original_data,[-1,data_shape[1],1])
-    pdb.set_trace()
+    original_data = data[idx] #shape: [nbtodraw, 28x28]
+    # tiling original as in build_model
+    tilded_original_data = np.tile(original_data,(1,nsamples)) #shape: [nbtodraw, 28x28*nsamples]
+    tilded_original_data = np.reshape(tilded_original_data,[nbtodraw*nsamples,-1]) #shape: [nbtodraw*nsamples,28x28]
+    original_data_tostack = np.reshape(original_data,[nbtodraw,-1,1])
     # Cache data with ones
-    cache_data = np.ones_like(orginal_data) #shape: [nbsamples, 28x28]
-    cache_data[:,:-300] = original_data[:,-300] #shape: [nbsamples, 28x28]
-    cache_data_tostack = np.reshape(cache_data,[-1,data_shape[1],1])
-    pdb.set_trace()
-    # prediction (10 samples)
-    preds = tf.stack(predictions,axe=0) #shape: [300, 10xnbsamples]
-    preds = tf.reshape(preds,[300,data_shape[0],-1]) #shape: [300, nbsamples, 10]
-    preds = tf.transpose(preds,perm=[1,0,2]) #shape: [nbsamples, 300, 10]
-    preds_shape = preds.get_shape()
-    pdb.set_trace()
-    mask = np.ones([preds_shape[0],preds_shape[1]-npixels,preds_shape[1]]) #shape: [nbsamples, 300-npixels, 10]
-    preds[:,npixels:,:] = mask #shape: [nbsamples, 300, 10]
-    list_ = [original_data for _ in range(10)] #shape: 10 x [nbsamples, 28x28]
-    im_pred = np.stack(original_data, axis=0) #shape: [10, nbsamples, 28x28]
-    im_pred = np.transpose(im_pred,(1,2,0)) #shape: [nbsamples, 28x28, 10]
-    im_pred[:,-300:,:] = preds_
+    cache_data = np.ones_like(original_data) #shape: [nbtodraw, 28x28]
+    cache_data[:,:-300] = original_data[:,:-300] #shape: [nbtodraw, 28x28]
+    tilded_cache_data = np.tile(cache_data,(1,nsamples)) #shape: [nbtodraw, 28x28*nsamples]
+    tilded_cache_data = np.reshape(tilded_cache_data,[nbtodraw*nsamples,-1]) #shape: [nbtodraw*nsamples,28x28]
+    cache_data_tostack = np.reshape(cache_data,[nbtodraw,-1,1])
+    # prediction (nsamples samples)
+    preds = tf.stack(predictions,axis=1) #shape: [nsamplesxnbsample,300,1]
+    preds = tf.reshape(preds,[data_shape[0]*nsamples,-1]) #shape: [nsamplesxnbsample,300]
+    preds= preds.eval() #convert tensor to ndarray
+    preds = np.split(preds, data_shape[0], 0) #shape: nbsamples*[nsample, 300]
+    preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 300]
 
-    images = np.stack([original_data_tostack,cache_data_tostack,im_pred ],axe=2) #shape: [nbsamples, 28x28, 12]
-    images = np.reshape(images,[-1,IMAGE_SIZE,IMAGE_SIZE,12]) #shape: [nbsamples, 28, 28, 12]
-
-    return images
+    preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 300]
+    preds_todraw = np.reshape(preds_todraw, [nbtodraw*nsamples,-1]) #shape: [nbtodraw*nbsamples, 300]
+    im_pred = tilded_cache_data
+    # replacing original by prediction
+    if npixels==300:
+        im_pred[:,-300:] = preds_todraw[:,:npixels] #shape: [nbtodraw*nsamples, 28x28]
+    else:
+        im_pred[:,-300:-300+npixels] = preds_todraw[:,:npixels]  #shape: [nbtodraw*nsamples, 28x28]
+    im_pred = np.reshape(im_pred,[nbtodraw,nsamples,-1]) #shape: [nbtodraw,nsamples, 28x28]
+    im_pred = np.transpose(im_pred,[0,2,1]) #shape: [nbtodraw, 28x28, nsamples]
+    # stacking all the images, first filter is the original, second is the cache, remaining are the predictions
+    images = np.concatenate((original_data_tostack,cache_data_tostack,im_pred), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
+    images = np.reshape(images,[nbtodraw,IMAGE_SIZE,IMAGE_SIZE,-1])*255.0 #shape: [nbtodraw, 28, 28, 2+nbsamples]
+    return images.astype("int32")
 
 def save_images(images,NB_PIX):
-    data_shape = images.get_shape()
+    data_shape = np.shape(images)
     for i in range(data_shape[0]):
+        DIR_NAME = "./inpainting/example_" + str(i)
+        #if not os.path.exists(os.path.dirname(DIR_NAME)):
+        if not tf.gfile.Exists(DIR_NAME):
+            tf.gfile.MkDir(DIR_NAME)
+            #os.makedirs(os.path.dirname(DIR_NAME))
         for j in range(data_shape[3]):
             fig=plt.figure()
             if j==0:
                 plt.title("Original", fontsize=20)
-                DIR = "./inpainting/example_" + str(i) + "/original.png"
+                FILE_NAME = "original.png"
+                DST = os.path.join(DIR_NAME, FILE_NAME)
             elif j==1:
                 plt.title("cache", fontsize=20)
-                DIR = "./inpainting/example_" + str(i) + "/cache.png"
+                FILE_NAME = "cache.png"
+                DST = os.path.join(DIR_NAME, FILE_NAME)
             else:
                 plt.title("inpainting " + str(NB_PIX), fontsize=20)
-                DIR = "./inpainting/example_" + str(i) + "/sample_" + str(j) + "/" + str(NB_PIX) + ".png"
-            plt.imshow(images[i,:,:,j], cmap=None, interpolation=None)
-            plt.axis("off")
-            fig.savefig(DIR)
+                SUB_DIR = "sample_" + str(j-2)
+                SUB_DIR_PATH = os.path.join(DIR_NAME,SUB_DIR)
+                #if not os.path.exists(os.path.dirname("/".join(SUB_DIR))):
+                if not tf.gfile.Exists(SUB_DIR_PATH):
+                    os.makedirs(SUB_DIR_PATH)
+                FILE_NAME = str(NB_PIX) + ".png"
+                FILE_NAME = os.path.join(SUB_DIR,FILE_NAME)
+            DST = os.path.join(DIR_NAME, FILE_NAME)
+            plt.imshow(images[i,:,:,j], cmap="gray", interpolation=None)
+            plt.axis("on")
+            fig.savefig(DST)
             plt.close()
 
+def create_DST_DIT(name_model):
+    NAME = "model_" + str(name_model) + ".ckpt"
+    DIR = "models"
+    SUB_DIR = os.path.join(DIR,NAME[:-5])
+    if not tf.gfile.Exists(SUB_DIR):
+        os.makedirs(SUB_DIR)
+    DST = os.path.join(SUB_DIR,NAME)
+    return DST
+
 ######################################## Main ########################################
-def in_painting(model_archi,data,nsample=100):
+def in_painting(model_archi,gt_data,cache_data):
     nn_model = model_archi["name"]
-    cache_data, idx = get_cache_data_set(data,nsample=nsample)
+    # get weights path
+    DST = create_DST_DIT(nn_model)
 
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
-    test_data_node = tf.placeholder(dtype = part2.data_type(), shape=(nsample, np.shape(cache_data)[1]))
-
+    test_data_node = tf.placeholder(dtype = part2.data_type(), shape=(np.shape(gt_data)[0], np.shape(gt_data)[1]))
+    cache_data_node = tf.placeholder(dtype = part2.data_type(), shape=(np.shape(cache_data)[0], np.shape(cache_data)[1]))
     ###### Build model and loss ######
-    test_logits, test_pred = build_model.model_inpainting(test_data_node,
+    test_logits, test_pred = build_model.model_inpainting(cache_data_node,
                                                             name=nn_model,
                                                             cell=model_archi["cell"],
                                                             nlayers=model_archi["layers"],
@@ -120,13 +152,16 @@ def in_painting(model_archi,data,nsample=100):
     pred_cross_entropy = get_loss(logits=test_logits,targets=test_pred)
 
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
-    #vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-    #name_vars = [v.name for v in vars_]
+    """
+    vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+    name_vars = [v.name for v in vars_]
     #pdb.set_trace()
-
+    """
 
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
+        print("\nStart testing...")
+        start_time = time.time()
         tf.global_variables_initializer().run()
         csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
         Testwriter = csv.writer(csvfileTest, delimiter=';',)
@@ -135,27 +170,35 @@ def in_painting(model_archi,data,nsample=100):
                             'Predict CE 10','Grount truth CE 10'
                             'Predict CE 1','Grount truth CE 1'])
         # Testing
-        WORK_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
-        if not tf.gfile.Exists(WORK_DIRECTORY):
+        if not tf.gfile.Exists(DST):
             raise Exception("no weights given")
-        saver.restore(sess, WORK_DIRECTORY)
-        pdb.set_trace()
+        saver.restore(sess, DST)
 
         # Compute and print results once training is done
-        prediction_XE, GroundTruth_XE = sess.run([grtr_cross_entropy, pred_cross_entropy],
-                                                    feed_dict={test_data_node: test_data,})
-        test_acc = accuracy_logistic(test_pred,test_data[:,1:])
-        print("\nTesting after {} epochs.".format(num_epochs))
-        print("Predict Xent 300: {:.4f}, Ground truth Xent 300: {:.4f}".format(prediction_XE[0],GroundTruth_XE[0]))
+        predictions_pixel, prediction_XE, GroundTruth_XE = sess.run([test_pred, grtr_cross_entropy, pred_cross_entropy],
+                                                    feed_dict={test_data_node: gt_data,
+                                                    cache_data_node: cache_data})
+        print("Testing done, took: {:.4f}s".format(time.time()-start_time))
+        print("predicted Xent 300: {:.4f}, ground-truth Xent 300: {:.4f}".format(prediction_XE[0],GroundTruth_XE[0]))
         Testwriter.writerow([prediction_XE[0],GroundTruth_XE[0],
                             prediction_XE[1],GroundTruth_XE[1],
                             prediction_XE[2],GroundTruth_XE[2],
                             prediction_XE[3],GroundTruth_XE[3]])
 
         # in painting images and save
-        idxtosave = np.random.randint(0,nsample,5)
-        npixels = [1, 10, 28, 300]
+        print("\nStart inpainting...")
+        """
+        test = gt_data[:,-300:]
+        shpe = np.shape(test)
+        test = np.tile(test,(1,nsamples))
+        test = np.reshape(test,[shpe[0]*nsamples,-1])
+        test_list = [test[:,i] for i in range(np.shape(test)[1])]
+        """
+        idxtosave = np.random.randint(0,np.shape(cache_data)[0],7)
+        npixels = [300,]
+        #npixels = [1, 10, 28, 300]
         for npixel in npixels:
-            inpainting_images = inpaint_images(data, idx[idxtosave], cache_data, test_pred, npixel)
+            #inpainting_images = inpaint_images(gt_data, idxtosave, test_list, npixel)
+            inpainting_images = inpaint_images(gt_data, idxtosave, predictions_pixel, npixel)
             NB_PIX = str(npixel) + "pixels"
             save_images(inpainting_images,NB_PIX)

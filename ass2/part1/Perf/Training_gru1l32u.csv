@@ -1,3 +1,7 @@
-Num Epoch;Time;Training error;Training accuracy;Validation error;Validation accuracy
-1;576.9874970912933;0.706931089744;0.293068910256;0.628;0.372
-2;560.3147420883179;0.577178030303;0.422821969697;0.628;0.372
+Num Epoch;Time;Training loss;Training accuracy;Validation loss;Validation accuracy
+1;24.437141180038452;2.31068054835;0.0904947916667;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)";0.0868
+2;11.94309401512146;2.30621242523;0.0904947916667;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)";0.0868
+3;12.310689926147461;2.30230879784;0.0911458333333;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)";0.0868
+4;11.838490009307861;2.30033246676;0.0989583333333;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)";0.0868
+5;13.169088125228882;2.29886643092;0.116536458333;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)";0.0868
+6;23.851486921310425;2.29713837306;0.111979166667;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)";0.0962

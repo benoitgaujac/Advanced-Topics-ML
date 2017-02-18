@@ -24,8 +24,10 @@ VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 512
 
-num_epochs = 50
-epochs_per_checkpoint = 2
+num_epochs = 6
+epochs_per_checkpoint = 5
+
+from_pretrained_weights = True
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -35,20 +37,20 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.001}
-lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0005}
-lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0001}
-lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.001}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0005}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0001}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.001}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.00095}
+lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0003}
+lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0002}
+lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.00095}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.00095}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0003}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0002}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.00095}
 #models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
 #        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
 #        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-models = {"lstm1l32u": lstm1l32u,  "lstm1l64u":lstm1l64u, "gru1l32u":gru1l32u, "gru1l64u": gru1l64u} #"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
-        #"lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-        #"gru1l128u": gru1l128u , "gru3l32u": gru3l32u}
+models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
+        "lstm3l32u":lstm3l32u,}# "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+#        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
 
 
 ######################################## Data processing ########################################
@@ -117,30 +119,24 @@ def accuracy(predictions,labels):
 
 def binarize(images, threshold=0.1):
     return (threshold < images).astype("float32")
-"""
-######################################## Model ########################################
-def model(data, nn_model, train=True):
-    if nn_model=='Onelinear':
-        # one linear layer NN
-        y = build_model.Onelinear(data,build_model.OneLinear_weights)
-    elif nn_model=='OneHidden':
-        # one hidden layer NN
-        y = build_model.OneHidden(data,build_model.OneHidden_weights)
-    elif nn_model=='TwoHidden':
-        # two hidden layer NN
-        y = build_model.TwoHidden(data,build_model.TwoHidden_weights)
-    elif nn_model=='Conv1':
-        # convolutional NN
-        y = build_model.Conv1(data,build_model.Conv1_weights)
-    else:
-        # more advanced convolutional NN
-        y = build_model.conv(data,build_model.conv_weights,train)
 
-    return y
-"""
+def create_DST_DIT(name_model):
+    NAME = "model_" + str(name_model) + ".ckpt"
+    DIR = "models"
+    SUB_DIR = os.path.join(DIR,NAME[:-5])
+    if not tf.gfile.Exists(SUB_DIR):
+        os.makedirs(SUB_DIR)
+    DST = os.path.join(SUB_DIR,NAME)
+    return DST
+
+
 ######################################## Main ########################################
 def main(model_archi,train_data, train_labels, validation_data, validation_labels, test_data, test_labels, mode_):
     nn_model = model_archi["name"]
+    # Create weights dst DIR
+    DST = create_DST_DIT(nn_model)
+    print(DST)
+
     train_size = train_labels.shape[0]
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
@@ -190,8 +186,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    5*train_size,                       # Decay step.
-                    0.99,                               # Decay rate.
+                    10*train_size,                       # Decay step.
+                    0.98,                               # Decay rate.
                     staircase=True)
 
     ###### Optimizer ######
@@ -211,20 +207,28 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
-        tf.global_variables_initializer().run()
-
-        # Opening csv file
-        if mode_!="test":
-            csvfileTrain = open('Perf/Training_' + str(nn_model) + '.csv', 'w')
-            Trainwriter = csv.writer(csvfileTrain, delimiter=';',)
-            Trainwriter.writerow(['Num Epoch', 'Time', 'Training error', 'Training accuracy', 'Validation error','Validation accuracy'])
-
-        csvfileTest = open('Perf/Val_' + str(nn_model) + '.csv', 'w')
-        Testwriter = csv.writer(csvfileTest, delimiter=';',)
-        Testwriter.writerow(['Test error', 'Test accuracy'])
-
         # Training
         if mode_!="test":
+            # opening csv file
+            csvfileTrain = open('Perf/Training_' + str(nn_model) + '.csv', 'w')
+            Trainwriter = csv.writer(csvfileTrain, delimiter=';',)
+            Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Training accuracy', 'Validation loss','Validation accuracy'])
+
+            # Load pre trained models
+            if not tf.gfile.Exists(DST) or not from_pretrained_weights:
+                tf.global_variables_initializer().run()
+            else:
+                saver.restore(sess, DST)
+                batch = tf.Variable(0, dtype=data_type())
+                tf.variables_initializer([batch,]).run()
+                learning_rate = tf.train.exponential_decay(
+                                model_archi["init_learning_rate"],  # Base learning rate.
+                                batch * BATCH_SIZE,                 # Current index into the dataset.
+                                10*train_size,                       # Decay step.
+                                0.98,                               # Decay rate.
+                                staircase=True)
+                optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
+            # Training
             # initialize performance indicators
             best_train_loss, best_eval_loss = 10000.0, 10000.0
             best_train_acc, best_eval_acc = 0.0, 0.0
@@ -269,7 +273,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     #print("Validation loss: {:.4f}, Validation acc: {:.3f}%, Validation err: {:.3f}%".format(ev_loss,eval_acc*100, 100 - eval_acc*100))
                     if eval_acc>best_eval_acc:
                         best_eval_acc = eval_acc
-                        saver.save(sess,"models/model_" + str(nn_model) + ".ckpt")
+                        saver.save(sess,DST)
                     if ev_loss<best_eval_loss:
                         best_eval_loss = ev_loss
                     print("Val loss: {:.4f}, Best val loss: {:.4f}".format(ev_loss,best_eval_loss))
@@ -277,26 +281,29 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     sys.stdout.flush()
                 # Writing csv file with results and saving models
                 Trainwriter.writerow([epoch + 1, time.time() - start_time,
-                                    1 - train_acc, train_acc, 1 - eval_acc, eval_acc])
-        # Testing
-        #if mode_=="test":
-        WEIGHTS_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
-        if not tf.gfile.Exists(WEIGHTS_DIRECTORY):
-            raise Exception("no weights given")
-        saver.restore(sess, WEIGHTS_DIRECTORY)
+                                    train_loss, train_acc, eval_loss, eval_acc])
 
-        scope.reuse_variables()
+        # Testing
+        csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
+        Testwriter = csv.writer(csvfileTest, delimiter=';',)
+        Testwriter.writerow(['Test loss', 'Test accuracy'])
+        if not tf.gfile.Exists(DST):
+            raise Exception("no weights given")
+        saver.restore(sess, DST)
+        vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+        name_vars = [v.name for v in vars_]
         # Compute and print results once training is done
-        tst_loss, test_pred = sess.run([test_loss, test_prediction],
+        test_loss, test_pred = sess.run([test_loss, test_prediction],
                                             feed_dict={test_data_node: test_data,
                                                         test_labels_node: test_labels})
         test_acc = accuracy(test_pred,test_labels)
         #cf_mat = confusion_matrix(test_labels, np.argmax(test_pred, 1), labels=np.arange(NUM_LABELS))
         #scipy.io.savemat("Perf_part1/cfm_" + str(nn_model),{"m": cf_mat})
         print("\nTesting after {} epochs.".format(num_epochs))
-        print("Test loss: {:.4f}, Test acc: {:.2f}%".format(tst_loss,test_acc*100))
-        Testwriter.writerow([1 - test_acc,test_acc])
-
+        print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
+        Testwriter.writerow([test_loss,test_acc])
+        #tf.reset_default_graph()
+        sess.close()
 
 if __name__ == '__main__':
     ###### Load and get data ######
@@ -312,14 +319,13 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    #train_data = train_data[:6000]
-    #train_labels = train_labels[:6000]
+    train_data = train_data[:2000]
+    train_labels = train_labels[:2000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
-    if options.model not in models:
+    if options.model not in models.keys():
         for model_ in models.keys():
             main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
     else:
-        model_ = options.model
-        main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
+        main(models[options.model],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)

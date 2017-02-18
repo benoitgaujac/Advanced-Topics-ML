@@ -20,10 +20,13 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 128
+BATCH_SIZE = 256
+nsample = 15
 
-num_epochs = 21
-epochs_per_checkpoint = 10
+num_epochs = 50
+epochs_per_checkpoint = 2
+
+from_pretrained_weights = False
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -33,14 +36,14 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="train, test or inpainting mode")
 
 ######################################## Models architectures ########################################
-#lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32}
-#lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64}
-#lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128}
-#lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32}
+#lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.00095}
+#lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0002}
+#lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0002}
+#lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.00095}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.00095}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0002}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0002}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.00095}
 """
 models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
         "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
@@ -48,6 +51,7 @@ models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u
 """
 models = {"gru1l32u":gru1l32u, "gru1l64u": gru1l64u,
         "gru1l128u": gru1l128u , "gru3l32u": gru3l32u}
+#models = {"gru1l32u":gru1l32u,}
 
 ######################################## Data processing ########################################
 def data_type():
@@ -108,28 +112,42 @@ def get_data():
 
     return train_data, train_labels, validation_data, validation_labels, test_data, test_labels
 
+def get_cache_data_set(data,nsample=100):
+    data_shape = np.shape(data)
+    idx = np.random.randint(0,data_shape[0],nsample)
+    samples = data[idx]
+    return samples[:,:-300], idx
+
 ######################################## Utils functions ########################################
 def accuracy(predictions,labels):
     correct_prediction = (np.argmax(predictions, 1)==labels)
     return np.mean(correct_prediction)
 
 def accuracy_logistic(predictions,labels):
-    #pred_int = tf.to_int32(tf.rint(predictions))
-    #lab_int = tf.to_int32(labels)
     pred_int = np.rint(predictions).astype(np.int32)
     lab_int = labels.astype(np.int32)
     correct_prediction = (pred_int==lab_int)
-    #pdb.set_trace()
     return np.mean(correct_prediction)
 
 def binarize(images, threshold=0.1):
     return (threshold < images).astype("float32")
 
+def create_DST_DIT(name_model):
+    NAME = "model_" + str(name_model) + ".ckpt"
+    DIR = "models"
+    SUB_DIR = os.path.join(DIR,NAME[:-5])
+    if not tf.gfile.Exists(SUB_DIR):
+        os.makedirs(SUB_DIR)
+    DST = os.path.join(SUB_DIR,NAME)
+    return DST
+
 ######################################## Main ########################################
 def main(model_archi,train_data, validation_data, test_data, mode_):
     nn_model = model_archi["name"]
-    train_size = train_data.shape[0]
+    # Create weights DST dir
+    DST = create_DST_DIT(nn_model)
 
+    train_size = train_data.shape[0]
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
     train_data_node = tf.placeholder(dtype=data_type(),
@@ -138,7 +156,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                     shape=(np.shape(validation_data)[0], IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
     test_data_node = tf.placeholder(dtype = data_type(),
                                     shape=(np.shape(test_data)[0], IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-
     ###### Build model and loss ######
     with tf.variable_scope(nn_model) as scope:
         # Training
@@ -160,8 +177,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
         eval_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
                                                 targets=eval_data_node[:,1:],
                                                 logits=eval_logits))
-
-        #scope.reuse_variables()
         test_logits = build_model.model(test_data_node, name=nn_model,
                                                         cell=model_archi["cell"],
                                                         nlayers=model_archi["layers"],
@@ -170,48 +185,50 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
         test_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
                                                 targets=test_data_node[:,1:],
                                                 logits=test_logits))
-
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
-
     ###### CLearning rate decay ######
     learning_rate = tf.train.exponential_decay(
-                    0.005,                # Base learning rate.
-                    batch * BATCH_SIZE,  # Current index into the dataset.
-                    5*train_size,          # Decay step.
-                    0.98,                # Decay rate.
+                    model_archi["init_learning_rate"],  # Base learning rate.
+                    batch * BATCH_SIZE,                 # Current index into the dataset.
+                    10*train_size,                       # Decay step.
+                    0.97,                               # Decay rate.
                     staircase=True)
-
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-
     ###### Predictions for the current training minibatch ######
     train_prediction = tf.sigmoid(logits)
-
     ###### Predictions for the validation ######
     eval_prediction = tf.sigmoid(eval_logits)
-
     ###### Predictions for the test ######
     test_prediction = tf.sigmoid(test_logits)
-
     ###### Saver ######
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
 
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
-        tf.global_variables_initializer().run()
-
-        # Opening csv file
+        # Training
         if mode_!="test":
+            # Opening csv file
             csvfileTrain = open('Perf/Training_' + str(nn_model) + '.csv', 'w')
             Trainwriter = csv.writer(csvfileTrain, delimiter=';',)
             Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Validation loss'])
-        csvfileTest = open('Perf/Val_' + str(nn_model) + '.csv', 'w')
-        Testwriter = csv.writer(csvfileTest, delimiter=';',)
-        Testwriter.writerow(['Test error'])
 
-        # Training
-        if mode_!="test":
+            # Load pre trained model if exist
+            if not tf.gfile.Exists(DST) or not from_pretrained_weights:
+                tf.global_variables_initializer().run()
+            else:
+                saver.restore(sess, DST)
+                #batch = tf.Variable(0, dtype=data_type())
+                tf.variables_initializer([batch,]).run()
+                learning_rate = tf.train.exponential_decay(
+                                model_archi["init_learning_rate"],  # Base learning rate.
+                                batch * BATCH_SIZE,                 # Current index into the dataset.
+                                10*train_size,                       # Decay step.
+                                0.97,                               # Decay rate.
+                                staircase=True)
+                optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
+
             # initialize performance indicators
             best_train_loss, best_eval_loss = 10000.0, 10000.0
             best_train_acc, best_eval_acc = 0.0, 0.0
@@ -249,7 +266,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     eval_acc = accuracy_logistic(eval_pred,validation_data[:,1:])
                     if eval_acc>best_eval_acc:
                         best_eval_acc = eval_acc
-                        saver.save(sess,"models/model_" + str(nn_model) + ".ckpt")
+                        saver.save(sess,DST)
                     if ev_loss<best_eval_loss:
                         best_eval_loss = ev_loss
                     print("Validation loss: {:.4f}, Best validation loss: {:.4f}, Best validation accuracy: {:.2f}%".format(
@@ -258,22 +275,19 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 # Writing csv file with results and saving models
                 Trainwriter.writerow([epoch + 1, time.time() - start_time, train_loss, eval_loss])
         # Testing
-        WEIGHTS_DIRECTORY = "./models/model_" + str(nn_model) + ".ckpt"
-        if not tf.gfile.Exists(WEIGHTS_DIRECTORY):
+        csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
+        Testwriter = csv.writer(csvfileTest, delimiter=';',)
+        Testwriter.writerow(['Test loss'])
+        if not tf.gfile.Exists(DST):
             raise Exception("no weights given")
-        saver.restore(sess, WEIGHTS_DIRECTORY)
-        vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-        name_vars = [v.name for v in vars_]
-        pdb.set_trace()
-
+        saver.restore(sess, DST)
         # Compute and print results once training is done
-        tst_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={
+        test_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={
                                                         test_data_node: test_data,})
         test_acc = accuracy_logistic(test_pred,test_data[:,1:])
         print("\nTesting after {} epochs.".format(num_epochs))
-        print("Test loss: {:.4f}, Test acc: {:.2f}%, Test err: {:.2f}%".format(tst_loss,test_acc*100, 100 - test_acc*100))
-        Testwriter.writerow([1 - test_acc,test_acc])
-
+        print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
+        Testwriter.writerow([test_loss])
 
 if __name__ == '__main__':
     ###### Load and get data ######
@@ -290,23 +304,23 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:5000]
-    #validation_data = validation_data[:2000]
+    #train_data = train_data[:5000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.mode!="inpainting":
-        # run for model
+        # Training or testing
         if options.model not in models:
             for model_ in models.keys():
                 main(models[model_],train_data, validation_data, test_data, options.mode)
         else:
             main(models[options.model],train_data, validation_data, test_data, options.mode)
     elif options.mode=="inpainting":
-        # run for model
+        # pixel in-painting
+        cache_data, idx = get_cache_data_set(test_data,nsample=nsample)
         if options.model not in models:
             for model_ in models.keys():
-                inpainting.in_painting(models[model_],test_data,10)
+                inpainting.in_painting(models[model_],test_data[idx],cache_data)
         else:
-            inpainting.in_painting(models[options.model],test_data)
+            inpainting.in_painting(models[options.model],test_data[idx],cache_data)
     else:
         raise Exception("mode must be train, test or inpainting")

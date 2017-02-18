@@ -14,7 +14,7 @@ NUM_CHANNELS = 1
 NUM_LABELS = 10
 SEED = 66478  # Set to None for random seed.
 fully_connected_neurons = 100
-keep_prob = 0.75
+keep_prob = 0.8
 
 ######################################## Model ########################################
 def weight_variable(shape,name,layer):

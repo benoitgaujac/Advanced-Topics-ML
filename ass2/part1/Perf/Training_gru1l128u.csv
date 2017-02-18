@@ -1,1 +1,1 @@
-Num Epoch;Time;Training error;Training accuracy;Validation error;Validation accuracy
+Num Epoch;Time;Training loss;Training accuracy;Validation loss;Validation accuracy
