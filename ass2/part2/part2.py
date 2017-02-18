@@ -8,7 +8,7 @@ import numpy as np
 from six.moves import urllib
 import tensorflow as tf
 import build_model
-import inpainting
+#import inpainting
 import csv
 from sklearn.utils import shuffle
 
@@ -308,7 +308,7 @@ if __name__ == '__main__':
         if options.model not in models:
             if options.mode=="train":
                 for model_ in models.keys():
-                    main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
+                    main(models[model_],train_data, validation_data, test_data, options.mode)
             else:
                 raise Exception("You have to give one unique existing model to test")
         else:
