@@ -107,9 +107,6 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
     # We create nsamples identic images from the original one
     images_embedded = tf.tile(x,(1,nsamples)) # shape [batch_size,IMAGE_SIZE * IMAGE_SIZE*nsamples]
     images_embedded = tf.reshape(images_embedded,[xshape[0]*nsamples,-1,1]) # shape [batch_size*nsamples,IMAGE_SIZE * IMAGE_SIZE]
-    #images_embedded = tf.stack([x for _ in range(nsamples)],axis=1) #shape: [batch_size,nsamples,IMAGE_SIZE * IMAGE_SIZE]
-    #imshape = images_embedded.get_shape().as_list()
-    #images_embedded = tf.reshape(images_embedded, [imshape[0]*imshape[1],imshape[2],1]) # shape [nsamples*batch_size,IMAGE_SIZE * IMAGE_SIZE,1]
     imshape = images_embedded.get_shape().as_list()
     # Creating base Cell
     cells = base_cell(cell, nlayers, nunits, training)

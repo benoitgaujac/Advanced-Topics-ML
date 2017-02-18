@@ -66,15 +66,16 @@ def inpaint_images(data, idx, predictions, npixels):
     tilded_cache_data = np.tile(cache_data,(1,nsamples)) #shape: [nbtodraw, 28x28*nsamples]
     tilded_cache_data = np.reshape(tilded_cache_data,[nbtodraw*nsamples,-1]) #shape: [nbtodraw*nsamples,28x28]
     cache_data_tostack = np.reshape(cache_data,[nbtodraw,-1,1])
-    # prediction (nsamples samples)
+    # prediction for nsamples samples
+    # preprocess predictions
     preds = tf.stack(predictions,axis=1) #shape: [nsamplesxnbsample,300,1]
     preds = tf.reshape(preds,[data_shape[0]*nsamples,-1]) #shape: [nsamplesxnbsample,300]
     preds= preds.eval() #convert tensor to ndarray
     preds = np.split(preds, data_shape[0], 0) #shape: nbsamples*[nsample, 300]
     preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 300]
-
     preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 300]
     preds_todraw = np.reshape(preds_todraw, [nbtodraw*nsamples,-1]) #shape: [nbtodraw*nbsamples, 300]
+    # create images to inpaint
     im_pred = tilded_cache_data
     # replacing original by prediction
     if npixels==300:
@@ -92,10 +93,8 @@ def save_images(images,NB_PIX):
     data_shape = np.shape(images)
     for i in range(data_shape[0]):
         DIR_NAME = "./inpainting/example_" + str(i)
-        #if not os.path.exists(os.path.dirname(DIR_NAME)):
         if not tf.gfile.Exists(DIR_NAME):
             tf.gfile.MkDir(DIR_NAME)
-            #os.makedirs(os.path.dirname(DIR_NAME))
         for j in range(data_shape[3]):
             fig=plt.figure()
             if j==0:
@@ -110,7 +109,6 @@ def save_images(images,NB_PIX):
                 plt.title("inpainting " + str(NB_PIX), fontsize=20)
                 SUB_DIR = "sample_" + str(j-2)
                 SUB_DIR_PATH = os.path.join(DIR_NAME,SUB_DIR)
-                #if not os.path.exists(os.path.dirname("/".join(SUB_DIR))):
                 if not tf.gfile.Exists(SUB_DIR_PATH):
                     os.makedirs(SUB_DIR_PATH)
                 FILE_NAME = str(NB_PIX) + ".png"
@@ -173,11 +171,9 @@ def in_painting(model_archi,gt_data,cache_data):
         if not tf.gfile.Exists(DST):
             raise Exception("no weights given")
         saver.restore(sess, DST)
-
         # Compute and print results once training is done
         predictions_pixel, prediction_XE, GroundTruth_XE = sess.run([test_pred, grtr_cross_entropy, pred_cross_entropy],
-                                                    feed_dict={test_data_node: gt_data,
-                                                    cache_data_node: cache_data})
+                                                    feed_dict={test_data_node: gt_data, cache_data_node: cache_data})
         print("Testing done, took: {:.4f}s".format(time.time()-start_time))
         print("predicted Xent 300: {:.4f}, ground-truth Xent 300: {:.4f}".format(prediction_XE[0],GroundTruth_XE[0]))
         Testwriter.writerow([prediction_XE[0],GroundTruth_XE[0],
@@ -195,8 +191,8 @@ def in_painting(model_archi,gt_data,cache_data):
         test_list = [test[:,i] for i in range(np.shape(test)[1])]
         """
         idxtosave = np.random.randint(0,np.shape(cache_data)[0],7)
-        npixels = [300,]
-        #npixels = [1, 10, 28, 300]
+        #npixels = [300,]
+        npixels = [1, 10, 28, 300]
         for npixel in npixels:
             #inpainting_images = inpaint_images(gt_data, idxtosave, test_list, npixel)
             inpainting_images = inpaint_images(gt_data, idxtosave, predictions_pixel, npixel)

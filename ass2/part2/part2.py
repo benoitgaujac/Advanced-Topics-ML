@@ -24,9 +24,9 @@ BATCH_SIZE = 256
 nsample = 15
 
 num_epochs = 50
-epochs_per_checkpoint = 2
+epochs_per_checkpoint = 5
 
-from_pretrained_weights = False
+from_pretrained_weights = True
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -40,10 +40,10 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
 #lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0002}
 #lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0002}
 #lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.00095}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.00095}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0002}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0002}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.00095}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0001}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0001}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.001}
 """
 models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
         "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
@@ -213,13 +213,11 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             csvfileTrain = open('Perf/Training_' + str(nn_model) + '.csv', 'w')
             Trainwriter = csv.writer(csvfileTrain, delimiter=';',)
             Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Validation loss'])
-
             # Load pre trained model if exist
             if not tf.gfile.Exists(DST) or not from_pretrained_weights:
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)
-                #batch = tf.Variable(0, dtype=data_type())
                 tf.variables_initializer([batch,]).run()
                 learning_rate = tf.train.exponential_decay(
                                 model_archi["init_learning_rate"],  # Base learning rate.
@@ -227,7 +225,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                 10*train_size,                       # Decay step.
                                 0.97,                               # Decay rate.
                                 staircase=True)
-                optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
 
             # initialize performance indicators
             best_train_loss, best_eval_loss = 10000.0, 10000.0
@@ -282,8 +279,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             raise Exception("no weights given")
         saver.restore(sess, DST)
         # Compute and print results once training is done
-        test_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={
-                                                        test_data_node: test_data,})
+        test_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={test_data_node: test_data,})
         test_acc = accuracy_logistic(test_pred,test_data[:,1:])
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
@@ -304,22 +300,28 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    #train_data = train_data[:5000]
+    #train_data = train_data[:25000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.mode!="inpainting":
         # Training or testing
         if options.model not in models:
-            for model_ in models.keys():
-                main(models[model_],train_data, validation_data, test_data, options.mode)
+            if options.mode=="train":
+                for model_ in models.keys():
+                    main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
+            else:
+                raise Exception("You have to give one unique existing model to test")
         else:
             main(models[options.model],train_data, validation_data, test_data, options.mode)
     elif options.mode=="inpainting":
         # pixel in-painting
         cache_data, idx = get_cache_data_set(test_data,nsample=nsample)
         if options.model not in models:
+            raise Exception("You have to give one unique existing model for inpainting")
+            """
             for model_ in models.keys():
                 inpainting.in_painting(models[model_],test_data[idx],cache_data)
+            """
         else:
             inpainting.in_painting(models[options.model],test_data[idx],cache_data)
     else:
