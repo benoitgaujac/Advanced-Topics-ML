@@ -18,22 +18,14 @@ keep_prob = 0.8
 
 ######################################## Model ########################################
 def weight_variable(shape,name,layer):
-    #initial = tf.truncated_normal(shape, stddev=0.1)
-    #return tf.Variable(initial,dtype=data_type())
     initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.1, seed=SEED, dtype=data_type())
-    #with tf.variable_scope(name):
     return tf.get_variable("weights_" + layer, shape, initializer=initializer)
 
-
 def bias_variable(shape,name,layer):
-    #initial = tf.constant(0.1, shape=shape)
-    #return tf.Variable(initial,dtype=data_type())
     initializer = tf.constant_initializer(0.1)
-    #with tf.variable_scope(name):
     return tf.get_variable("biais_" + layer, shape, initializer=initializer)
 
 def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
-    #with tf.variable_scope('RNN') as scope:
         imshape = x.get_shape().as_list()
         images_embedded = tf.reshape(x, [imshape[0],imshape[1],1]) # shape [batch_size,IMAGE_SIZE * IMAGE_SIZE,1]
 
@@ -67,69 +59,3 @@ def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
         biais_class = bias_variable([NUM_LABELS],name,"class")
 
         return tf.matmul(z,weight_class) + biais_class
-
-"""
-def Onelinear(x,weights):
-    # reshape image
-    x_ = tf.reshape(x,[-1,IMAGE_SIZE*IMAGE_SIZE])
-    return tf.matmul(x_, weights["W"]) + weights["b"]
-
-def OneHidden(x,weights):
-    fully_connected_neurons = 128
-    # reshape image
-    x_ = tf.reshape(x,[-1,IMAGE_SIZE*IMAGE_SIZE])
-    # Relu layer
-    shape1 = [IMAGE_SIZE*IMAGE_SIZE, fully_connected_neurons]
-    z1 = tf.nn.relu(tf.matmul(x_, weights["W1"]) + weights["b1"])
-    # Linear layer
-    shape2 = [fully_connected_neurons, NUM_LABELS]
-    return tf.matmul(z1, weights["W2"]) + weights["b2"]
-
-def TwoHidden(x,weights):
-    fully_connected_neurons = 256
-    # reshape image
-    x_ = tf.reshape(x,[-1,IMAGE_SIZE*IMAGE_SIZE])
-    # first Relu layer
-    z1 = tf.nn.relu(tf.matmul(x_, weights["W1"]) + weights["b1"])
-    # second Relu layer
-    z2 = tf.nn.relu(tf.matmul(z1, weights["W2"]) + weights["b2"])
-    # Linear layer
-    return tf.matmul(z2, weights["W3"]) + weights["b3"]
-
-def Conv1(x,weights):
-    fully_connected_neurons = 256
-    # first conv layer
-    zconv1 = tf.nn.conv2d(x, weights["Wconv1"], strides=[1, 1, 1, 1], padding='SAME')
-    zconv1 = tf.nn.max_pool(zconv1 + weights["bconv1"], ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-    # second conv layer
-    zconv2 = tf.nn.conv2d(zconv1, weights["Wconv2"], strides=[1, 1, 1, 1], padding='SAME')
-    zconv2 = tf.nn.max_pool(zconv2 + weights["bconv2"], ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-    # Flatten
-    zconv2_flat = tf.reshape(zconv2,[-1,int(IMAGE_SIZE/4*IMAGE_SIZE/4*num_filters)])
-    # Relu layer
-    zdense1 = tf.nn.relu(tf.matmul(zconv2_flat, weights["Wdense1"]) + weights["bdense1"])
-    # Linear layer
-    return tf.matmul(zdense1, weights["Wdense2"]) + weights["bdense2"]
-
-def conv(x,weights,train=False):
-    fully_connected_neurons = 256
-    # first conv layer
-    zconv1 = tf.nn.conv2d(x, weights["Wconv1"], strides=[1, 1, 1, 1], padding='SAME')
-    zconv1 = tf.nn.max_pool(zconv1 + weights["bconv1"], ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-    # second conv layer
-    zconv2 = tf.nn.conv2d(zconv1, weights["Wconv2"], strides=[1, 1, 1, 1], padding='SAME')
-    zconv2 = tf.nn.max_pool(zconv2 + weights["bconv2"], ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-    # Flatten
-    zconv2_flat = tf.reshape(zconv2,[-1,int(IMAGE_SIZE/4*IMAGE_SIZE/4*2*num_filters)])
-    # Relu layer
-    zdense1 = tf.nn.relu(tf.matmul(zconv2_flat, weights["Wdense1"]) + weights["bdense1"])
-    # Add a 50% dropout during training only
-    if train:
-        zdense1 = tf.nn.dropout(zdense1, 0.5, seed=SEED)
-    # Linear layer
-    return tf.matmul(zdense1, weights["Wdense2"]) + weights["bdense2"]
-"""

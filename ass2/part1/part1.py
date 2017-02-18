@@ -22,7 +22,7 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 512
+BATCH_SIZE = 128
 
 num_epochs = 6
 epochs_per_checkpoint = 5
@@ -129,7 +129,6 @@ def create_DST_DIT(name_model):
     DST = os.path.join(SUB_DIR,NAME)
     return DST
 
-
 ######################################## Main ########################################
 def main(model_archi,train_data, train_labels, validation_data, validation_labels, test_data, test_labels, mode_):
     nn_model = model_archi["name"]
@@ -158,7 +157,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                                     nlayers=model_archi["layers"],
                                                     nunits=model_archi["units"],
                                                     training=True)
-        #pdb.set_trace()
         loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                     labels=train_labels_node, logits=logits))
 
@@ -219,7 +217,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)
-                batch = tf.Variable(0, dtype=data_type())
+                # Reinitialize learning rate
                 tf.variables_initializer([batch,]).run()
                 learning_rate = tf.train.exponential_decay(
                                 model_archi["init_learning_rate"],  # Base learning rate.
@@ -227,7 +225,9 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                 10*train_size,                       # Decay step.
                                 0.98,                               # Decay rate.
                                 staircase=True)
+                """
                 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
+                """
             # Training
             # initialize performance indicators
             best_train_loss, best_eval_loss = 10000.0, 10000.0
@@ -325,7 +325,10 @@ if __name__ == '__main__':
     options, arguments = parser.parse_args(sys.argv)
     # run for model
     if options.model not in models.keys():
-        for model_ in models.keys():
-            main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
+        if options.mode=="train":
+            for model_ in models.keys():
+                main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
+        else:
+            raise Exception("You have to give one unique existing model to test")
     else:
         main(models[options.model],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
