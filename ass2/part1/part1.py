@@ -9,8 +9,6 @@ from six.moves import urllib
 import tensorflow as tf
 import build_model
 import csv
-import scipy.io
-from sklearn.metrics import confusion_matrix
 from sklearn.utils import shuffle
 
 
@@ -23,9 +21,10 @@ NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 128
+BATCH_SIZE_EVAL = 1024
 
-num_epochs = 6
-epochs_per_checkpoint = 5
+num_epochs = 3
+epochs_per_checkpoint = 2
 
 from_pretrained_weights = True
 
@@ -129,6 +128,19 @@ def create_DST_DIT(name_model):
     DST = os.path.join(SUB_DIR,NAME)
     return DST
 
+def get_batches(images, labels, batch_size=BATCH_SIZE):
+    batches = []
+    X, y = shuffle(images, labels)
+    for i in range(int(X.shape[0]/batch_size)+1):
+        if i<int(X.shape[0]/batch_size):
+            X_batch = X[i * batch_size: (i + 1) * batch_size]
+            y_batch = y[i * batch_size: (i + 1) * batch_size]
+        else:
+            X_batch = X[-batch_size:]
+            y_batch = y[-batch_size:]
+        batches.append([X_batch, y_batch])
+    return batches
+
 ######################################## Main ########################################
 def main(model_archi,train_data, train_labels, validation_data, validation_labels, test_data, test_labels, mode_):
     nn_model = model_archi["name"]
@@ -139,15 +151,10 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     train_size = train_labels.shape[0]
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
-    train_data_node = tf.placeholder(
-                    data_type(),shape=(BATCH_SIZE, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+    train_data_node = tf.placeholder(data_type(),shape=(BATCH_SIZE, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
     train_labels_node = tf.placeholder(tf.int64, shape=(BATCH_SIZE,))
-    eval_data_node = tf.placeholder(
-                    data_type(),shape=(np.shape(validation_data)[0], IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    eval_labels_node = tf.placeholder(tf.int64, shape=(np.shape(validation_labels)[0],))
-    test_data_node = tf.placeholder(
-                    data_type(),shape=(np.shape(test_data)[0], IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    test_labels_node = tf.placeholder(tf.int64, shape=(np.shape(test_labels)[0],))
+    eval_data_node = tf.placeholder(data_type(),shape=(BATCH_SIZE_EVAL, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+    eval_labels_node = tf.placeholder(tf.int64, shape=(BATCH_SIZE_EVAL,))
 
     ###### Build model and loss ######
     with tf.variable_scope(nn_model) as scope:
@@ -169,13 +176,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                                         training=False)
         eval_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                     labels=eval_labels_node, logits=eval_logits))
-        test_logits = build_model.model(test_data_node, name=nn_model,
-                                                        cell=model_archi["cell"],
-                                                        nlayers=model_archi["layers"],
-                                                        nunits=model_archi["units"],
-                                                        training=False)
-        test_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                                    labels=test_labels_node, logits=test_logits))
 
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
@@ -196,9 +196,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
     ###### Predictions for the validation ######
     eval_prediction = tf.nn.softmax(eval_logits)
-
-    ###### Predictions for the test ######
-    test_prediction = tf.nn.softmax(test_logits)
 
     ###### Saver ######
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
@@ -225,9 +222,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                 10*train_size,                       # Decay step.
                                 0.98,                               # Decay rate.
                                 staircase=True)
-                """
-                optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-                """
+
             # Training
             # initialize performance indicators
             best_train_loss, best_eval_loss = 10000.0, 10000.0
@@ -239,24 +234,17 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 train_loss, train_acc = 0.0, 0.0
                 print("")
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-                n_step = int(float(train_size) / BATCH_SIZE)
-                for step in range(n_step):
-                    # Note that we could use better randomization across epochs.
-                    offset = (step * BATCH_SIZE) % (train_size - BATCH_SIZE)
-                    batch_data = train_data[offset:(offset + BATCH_SIZE), ...]
-                    batch_labels = train_labels[offset:(offset + BATCH_SIZE)]
-                    feed_dict = {train_data_node: batch_data,
-                               train_labels_node: batch_labels}
+                Batches = get_batches(train_data, train_labels, BATCH_SIZE)
+                for batch in Batches:
+                    feed_dict={train_data_node: batch[0],train_labels_node: batch[1]}
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
-                    l, lr, predictions = sess.run([loss, learning_rate, train_prediction],
-                                                    feed_dict=feed_dict)
+                    l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
-                    train_loss += l / n_step
-                    train_acc += accuracy(predictions,batch_labels) / n_step
+                    train_loss += l / len(Batches)
+                    train_acc += accuracy(predictions,batch[1]) / len(Batches)
                 # Print info for previous epoch
                 print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
-                #print("Epoch loss: {:.4f}, Epoch acc: {:.3f}%, Epoch err: {:.3f}%".format(train_loss,train_acc*100, 100 - train_acc*100))
                 if train_acc>best_train_acc:
                     best_train_acc = train_acc
                 if train_loss<best_train_loss:
@@ -265,23 +253,25 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 print("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
-                    ev_loss, eval_pred = sess.run([eval_loss, eval_prediction],
-                                                feed_dict={eval_data_node: validation_data,
-                                                eval_labels_node: validation_labels})
-                    #pdb.set_trace()
-                    eval_acc = accuracy(eval_pred,validation_labels)
-                    #print("Validation loss: {:.4f}, Validation acc: {:.3f}%, Validation err: {:.3f}%".format(ev_loss,eval_acc*100, 100 - eval_acc*100))
+                    eval_loss_, eval_acc = 0.0, 0.0
+                    eval_Batches = get_batches(validation_data, validation_labels, BATCH_SIZE_EVAL)
+                    for eval_batch in eval_Batches:
+                        ev_loss, ev_pred = sess.run([eval_loss, eval_prediction], feed_dict={
+                                                                eval_data_node: eval_batch[0],
+                                                                eval_labels_node: eval_batch[1]})
+                        eval_loss_ += ev_loss / len(eval_Batches)
+                        eval_acc += accuracy(ev_pred,eval_batch[1]) / len(eval_Batches)
                     if eval_acc>best_eval_acc:
                         best_eval_acc = eval_acc
                         saver.save(sess,DST)
-                    if ev_loss<best_eval_loss:
-                        best_eval_loss = ev_loss
-                    print("Val loss: {:.4f}, Best val loss: {:.4f}".format(ev_loss,best_eval_loss))
+                    if eval_loss_<best_eval_loss:
+                        best_eval_loss = eval_loss_
+                    print("Val loss: {:.4f}, Best val loss: {:.4f}".format(eval_loss_,best_eval_loss))
                     print("Val acc: {:.2f}%, Best val acc: {:.2f}%".format(eval_acc*100,best_eval_acc*100))
                     sys.stdout.flush()
                 # Writing csv file with results and saving models
                 Trainwriter.writerow([epoch + 1, time.time() - start_time,
-                                    train_loss, train_acc, eval_loss, eval_acc])
+                                    train_loss, train_acc, eval_loss_, eval_acc])
 
         # Testing
         csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
@@ -293,12 +283,14 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
         vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
         name_vars = [v.name for v in vars_]
         # Compute and print results once training is done
-        test_loss, test_pred = sess.run([test_loss, test_prediction],
-                                            feed_dict={test_data_node: test_data,
-                                                        test_labels_node: test_labels})
-        test_acc = accuracy(test_pred,test_labels)
-        #cf_mat = confusion_matrix(test_labels, np.argmax(test_pred, 1), labels=np.arange(NUM_LABELS))
-        #scipy.io.savemat("Perf_part1/cfm_" + str(nn_model),{"m": cf_mat})
+        test_loss, test_acc = 0.0, 0.0
+        test_Batches = get_batches(test_data, test_labels, BATCH_SIZE_EVAL)
+        for test_batch in test_Batches:
+            tst_loss, tst_pred = sess.run([eval_loss, eval_prediction], feed_dict={
+                                                        eval_data_node: test_batch[0],
+                                                        eval_labels_node: test_batch[1]})
+            test_loss += tst_loss / len(test_Batches)
+            test_acc += accuracy(tst_pred,test_batch[1]) / len(test_Batches)
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         Testwriter.writerow([test_loss,test_acc])
@@ -319,8 +311,6 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    train_data = train_data[:2000]
-    train_labels = train_labels[:2000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
