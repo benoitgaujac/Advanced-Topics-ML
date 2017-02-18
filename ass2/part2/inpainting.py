@@ -17,7 +17,7 @@ import part2
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
 SEED = 66478  # Set to None for random seed.
-nsamples = 3
+nsamples = 10
 
 ######################################## Data processing ########################################
 def get_cache_data_set(data,nsample=100):
@@ -190,7 +190,7 @@ def in_painting(model_archi,gt_data,cache_data):
         test = np.reshape(test,[shpe[0]*nsamples,-1])
         test_list = [test[:,i] for i in range(np.shape(test)[1])]
         """
-        idxtosave = np.random.randint(0,np.shape(cache_data)[0],7)
+        idxtosave = np.random.randint(0,np.shape(cache_data)[0],5)
         #npixels = [300,]
         npixels = [1, 10, 28, 300]
         for npixel in npixels:

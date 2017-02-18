@@ -8,7 +8,7 @@ import numpy as np
 from six.moves import urllib
 import tensorflow as tf
 import build_model
-#import inpainting
+import inpainting
 import csv
 from sklearn.utils import shuffle
 
@@ -21,9 +21,10 @@ PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 256
-nsample = 15
+BATCH_SIZE_EVAL = 2048
+nsample = 100
 
-num_epochs = 50
+num_epochs = 21
 epochs_per_checkpoint = 5
 
 from_pretrained_weights = True
@@ -40,10 +41,10 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
 #lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0002}
 #lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0002}
 #lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.00095}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0001}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0001}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.001}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.005}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0005}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0005}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.005}
 """
 models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
         "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
@@ -141,6 +142,18 @@ def create_DST_DIT(name_model):
     DST = os.path.join(SUB_DIR,NAME)
     return DST
 
+def get_batches(images, batch_size=BATCH_SIZE):
+    batches = []
+    X = shuffle(images)
+    for i in range(int(X.shape[0]/batch_size)+1):
+        if i<int(X.shape[0]/batch_size):
+            X_batch = X[i * batch_size: (i + 1) * batch_size]
+        else:
+            X_batch = X[-batch_size:]
+        batches.append(X_batch)
+    return batches
+
+
 ######################################## Main ########################################
 def main(model_archi,train_data, validation_data, test_data, mode_):
     nn_model = model_archi["name"]
@@ -153,9 +166,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     train_data_node = tf.placeholder(dtype=data_type(),
                                     shape=(BATCH_SIZE, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
     eval_data_node = tf.placeholder(dtype = data_type(),
-                                    shape=(np.shape(validation_data)[0], IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    test_data_node = tf.placeholder(dtype = data_type(),
-                                    shape=(np.shape(test_data)[0], IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+                                    shape=(BATCH_SIZE_EVAL, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+
     ###### Build model and loss ######
     with tf.variable_scope(nn_model) as scope:
         # Training
@@ -177,22 +189,15 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
         eval_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
                                                 targets=eval_data_node[:,1:],
                                                 logits=eval_logits))
-        test_logits = build_model.model(test_data_node, name=nn_model,
-                                                        cell=model_archi["cell"],
-                                                        nlayers=model_archi["layers"],
-                                                        nunits=model_archi["units"],
-                                                        training=False)
-        test_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-                                                targets=test_data_node[:,1:],
-                                                logits=test_logits))
+
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
     ###### CLearning rate decay ######
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    10*train_size,                       # Decay step.
-                    0.97,                               # Decay rate.
+                    2*train_size,                       # Decay step.
+                    0.99,                               # Decay rate.
                     staircase=True)
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
@@ -200,8 +205,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     train_prediction = tf.sigmoid(logits)
     ###### Predictions for the validation ######
     eval_prediction = tf.sigmoid(eval_logits)
-    ###### Predictions for the test ######
-    test_prediction = tf.sigmoid(test_logits)
     ###### Saver ######
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
 
@@ -236,18 +239,15 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 train_loss, train_acc = 0.0, 0.0
                 print("")
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-                n_step = int(float(train_size) / BATCH_SIZE)
-                for step in range(n_step):
-                    # Note that we could use better randomization across epochs.
-                    offset = (step * BATCH_SIZE) % (train_size - BATCH_SIZE)
-                    batch_data = train_data[offset:(offset + BATCH_SIZE), ...]
-                    feed_dict = {train_data_node: batch_data,}
+                Batches = get_batches(train_data, BATCH_SIZE)
+                for batch_ in Batches:
+                    feed_dict = {train_data_node: batch_}
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
                     l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
-                    train_loss += l / n_step
-                    train_acc += accuracy_logistic(predictions,batch_data[:,1:]) / n_step
+                    train_loss += l / len(Batches)
+                    train_acc += accuracy_logistic(predictions,batch_[:,1:]) / len(Batches)
                 # Print info for previous epoch
                 print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 if train_acc>best_train_acc:
@@ -258,16 +258,20 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                                             train_loss,best_train_loss,best_train_acc*100))
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
-                    ev_loss, eval_pred = sess.run([eval_loss, eval_prediction],
-                                    feed_dict={eval_data_node: validation_data,})
-                    eval_acc = accuracy_logistic(eval_pred,validation_data[:,1:])
+                    eval_loss_, eval_acc = 0.0, 0.0
+                    eval_Batches = get_batches(validation_data, BATCH_SIZE_EVAL)
+                    for eval_batch in eval_Batches:
+                        ev_loss, ev_pred = sess.run([eval_loss, eval_prediction],
+                                        feed_dict={eval_data_node: eval_batch})
+                        eval_loss_ += ev_loss / len(eval_Batches)
+                        eval_acc += accuracy_logistic(ev_pred,eval_batch[:,1:]) / len(eval_Batches)
                     if eval_acc>best_eval_acc:
                         best_eval_acc = eval_acc
                         saver.save(sess,DST)
-                    if ev_loss<best_eval_loss:
-                        best_eval_loss = ev_loss
+                    if eval_loss_<best_eval_loss:
+                        best_eval_loss = eval_loss_
                     print("Validation loss: {:.4f}, Best validation loss: {:.4f}, Best validation accuracy: {:.2f}%".format(
-                                                                                    ev_loss,best_eval_loss,best_eval_acc*100))
+                                                                                    eval_loss_,best_eval_loss,best_eval_acc*100))
                     sys.stdout.flush()
                 # Writing csv file with results and saving models
                 Trainwriter.writerow([epoch + 1, time.time() - start_time, train_loss, eval_loss])
@@ -279,8 +283,13 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             raise Exception("no weights given")
         saver.restore(sess, DST)
         # Compute and print results once training is done
-        test_loss, test_pred = sess.run([test_loss, test_prediction], feed_dict={test_data_node: test_data,})
-        test_acc = accuracy_logistic(test_pred,test_data[:,1:])
+        test_loss, test_acc = 0.0, 0.0
+        test_Batches = get_batches(test_data, BATCH_SIZE_EVAL)
+        for test_batch in test_Batches:
+            tst_loss, tst_pred = sess.run([eval_loss, eval_prediction],
+                                    feed_dict={eval_data_node: test_batch})
+            test_loss += tst_loss / len(test_Batches)
+            accuracy_logistic(tst_pred,test_batch[:,1:]) / len(test_Batches)
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         Testwriter.writerow([test_loss])
@@ -300,7 +309,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    #train_data = train_data[:25000]
+    train_data = train_data[:30000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.mode!="inpainting":

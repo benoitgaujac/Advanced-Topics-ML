@@ -235,14 +235,14 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 print("")
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 Batches = get_batches(train_data, train_labels, BATCH_SIZE)
-                for batch in Batches:
-                    feed_dict={train_data_node: batch[0],train_labels_node: batch[1]}
+                for batch_ in Batches:
+                    feed_dict={train_data_node: batch_[0],train_labels_node: batch_[1]}
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
                     l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
-                    train_acc += accuracy(predictions,batch[1]) / len(Batches)
+                    train_acc += accuracy(predictions,batch_[1]) / len(Batches)
                 # Print info for previous epoch
                 print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 if train_acc>best_train_acc:

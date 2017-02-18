@@ -1,2 +1,2 @@
-Predict CE 300;Grount truth CE 300;Predict CE 28;Grount truth CE 28;Predict CE 10;Grount truth CE 10Predict CE 1;Grount truth CE 1
-0.543458;0.10337;0.204779;0.145253;0.416237;0.286583;0.24018;0.184865
+Test loss
+0.100509658456
