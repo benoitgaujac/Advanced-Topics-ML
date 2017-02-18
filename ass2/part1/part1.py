@@ -20,11 +20,11 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 128
-BATCH_SIZE_EVAL = 1024
+BATCH_SIZE = 256
+BATCH_SIZE_EVAL = 256
 
-num_epochs = 3
-epochs_per_checkpoint = 2
+num_epochs = 26
+epochs_per_checkpoint = 5
 
 from_pretrained_weights = True
 
@@ -36,20 +36,20 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.00095}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.001}
 lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0003}
 lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0002}
-lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.00095}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.00095}
+lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.001}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
 gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0003}
 gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0002}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.00095}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.001}
 #models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
 #        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
 #        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
-        "lstm3l32u":lstm3l32u,}# "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-#        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
+models = {"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
+        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
 
 
 ######################################## Data processing ########################################
@@ -184,8 +184,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    10*train_size,                       # Decay step.
-                    0.98,                               # Decay rate.
+                    2*train_size,                       # Decay step.
+                    0.99,                               # Decay rate.
                     staircase=True)
 
     ###### Optimizer ######
@@ -311,6 +311,8 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
+    train_data = train_data[:25000]
+    train_labels = train_labels[:25000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
