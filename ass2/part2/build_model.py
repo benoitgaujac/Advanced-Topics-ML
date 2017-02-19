@@ -6,7 +6,7 @@ import pdb
 import numpy as np
 from six.moves import urllib
 import tensorflow as tf
-from part2 import data_type
+import part2
 #import inpainting
 
 nsamples = part2.nsamples
@@ -20,7 +20,7 @@ keep_prob = .7
 
 ######################################## Utils functions ########################################
 def weight_variable(shape,name,layer):
-    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.1, seed=SEED, dtype=data_type())
+    initializer = tf.truncated_normal_initializer(mean=0.0, stddev=0.1, seed=SEED, dtype=part2.data_type())
     return tf.get_variable("weights_" + layer, shape, initializer=initializer)
 
 def bias_variable(shape,name,layer):
@@ -78,7 +78,7 @@ def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
     cells = base_cell(cell, nlayers, nunits, training)
     # Build RNN network
     seq_lent = IMAGE_SIZE*IMAGE_SIZE * np.ones([imshape[0]])
-    outputs, state = tf.nn.dynamic_rnn(cells, images_embedded, dtype=data_type(), sequence_length=seq_lent) # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
+    outputs, state = tf.nn.dynamic_rnn(cells, images_embedded, dtype=part2.data_type(), sequence_length=seq_lent) # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
     out = tf.reshape(outputs, [-1,nunits]) #out shape [batch*(IMAGE_SIZE*IMAGE_SIZE),nunits]
     # Weights for classification layer
     weight_class = weight_variable([nunits,NUM_LABELS],name,"class")
@@ -104,7 +104,7 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
         biais_class = bias_variable([NUM_LABELS],name,"class")
         # Get state and ouputs up to the last visible pixel
         outputs, state = tf.nn.dynamic_rnn(cells, images_embedded,  # outputs shape: [nsamples*batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
-                                                dtype=data_type(),
+                                                dtype=part2.data_type(),
                                                 sequence_length=seq_lent)
         last_out = outputs[:,-1,:] # last_out shape: [nsamples*batch, nunits]
         last_out = tf.matmul(last_out,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
@@ -120,7 +120,7 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
         for i in range(300):
             # sample from bernuolli logits
             out, state = tf.nn.dynamic_rnn(cells, inputs,  # out shape [nsamples*batch,1,nunits]
-                                        dtype=data_type(),
+                                        dtype=part2.data_type(),
                                         sequence_length=seq_lent,
                                         initial_state=state)
             out = tf.reshape(out,[-1,nunits]) # out shape [nsamples*batch,nunits]
