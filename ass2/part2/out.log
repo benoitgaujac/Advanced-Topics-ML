@@ -1,0 +1,396 @@
+INFO:root:Start training gru1l128u...
+INFO:root:Epoch 0 done, took 261.61s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.3106, Best train loss: 0.3106, Best train accuracy: 86.97%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1981, Best validation loss: 0.1981, Best validation accuracy: 91.70%
+INFO:root:Epoch 1 done, took 249.89s, learning rate: 4.95e-4
+INFO:root:Epoch loss: 0.1783, Best train loss: 0.1783, Best train accuracy: 92.50%
+INFO:root:Start training gru1l64u...
+INFO:root:Epoch 0 done, took 127.91s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.4402, Best train loss: 0.4402, Best train accuracy: 79.60%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.3563, Best validation loss: 0.3563, Best validation accuracy: 87.52%
+INFO:root:Epoch 1 done, took 126.26s, learning rate: 4.95e-4
+INFO:root:Epoch loss: 0.3183, Best train loss: 0.3183, Best train accuracy: 87.88%
+INFO:root:Epoch 2 done, took 126.07s, learning rate: 4.95e-4
+INFO:root:Epoch loss: 0.2589, Best train loss: 0.2589, Best train accuracy: 89.36%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.2359, Best validation loss: 0.2359, Best validation accuracy: 90.49%
+INFO:root:Epoch 3 done, took 126.03s, learning rate: 4.90e-4
+INFO:root:Epoch loss: 0.2121, Best train loss: 0.2121, Best train accuracy: 91.64%
+INFO:root:Epoch 4 done, took 126.07s, learning rate: 4.90e-4
+INFO:root:Epoch loss: 0.1830, Best train loss: 0.1830, Best train accuracy: 92.78%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1704, Best validation loss: 0.1704, Best validation accuracy: 93.15%
+INFO:root:Epoch 5 done, took 126.00s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1739, Best train loss: 0.1739, Best train accuracy: 93.05%
+INFO:root:Epoch 6 done, took 125.88s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1680, Best train loss: 0.1680, Best train accuracy: 93.16%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1600, Best validation loss: 0.1600, Best validation accuracy: 93.35%
+INFO:root:Epoch 7 done, took 125.63s, learning rate: 4.80e-4
+INFO:root:Epoch loss: 0.1639, Best train loss: 0.1639, Best train accuracy: 93.23%
+INFO:root:Epoch 8 done, took 125.69s, learning rate: 4.80e-4
+INFO:root:Epoch loss: 0.1596, Best train loss: 0.1596, Best train accuracy: 93.28%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1532, Best validation loss: 0.1532, Best validation accuracy: 93.47%
+INFO:root:Epoch 9 done, took 126.19s, learning rate: 4.75e-4
+INFO:root:Epoch loss: 0.1570, Best train loss: 0.1570, Best train accuracy: 93.31%
+INFO:root:Epoch 10 done, took 125.68s, learning rate: 4.75e-4
+INFO:root:Epoch loss: 0.1535, Best train loss: 0.1535, Best train accuracy: 93.36%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1479, Best validation loss: 0.1479, Best validation accuracy: 93.56%
+INFO:root:Epoch 11 done, took 125.87s, learning rate: 4.71e-4
+INFO:root:Epoch loss: 0.1541, Best train loss: 0.1535, Best train accuracy: 93.36%
+INFO:root:Epoch 12 done, took 126.04s, learning rate: 4.71e-4
+INFO:root:Epoch loss: 0.1495, Best train loss: 0.1495, Best train accuracy: 93.47%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1444, Best validation loss: 0.1444, Best validation accuracy: 93.65%
+INFO:root:Epoch 13 done, took 125.92s, learning rate: 4.66e-4
+INFO:root:Epoch loss: 0.1476, Best train loss: 0.1476, Best train accuracy: 93.55%
+INFO:root:Epoch 14 done, took 126.10s, learning rate: 4.66e-4
+INFO:root:Epoch loss: 0.1464, Best train loss: 0.1464, Best train accuracy: 93.63%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1418, Best validation loss: 0.1418, Best validation accuracy: 93.80%
+INFO:root:Epoch 15 done, took 126.04s, learning rate: 4.61e-4
+INFO:root:Epoch loss: 0.1444, Best train loss: 0.1444, Best train accuracy: 93.75%
+INFO:root:Epoch 16 done, took 126.36s, learning rate: 4.61e-4
+INFO:root:Epoch loss: 0.1427, Best train loss: 0.1427, Best train accuracy: 93.85%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1379, Best validation loss: 0.1379, Best validation accuracy: 94.07%
+INFO:root:Epoch 17 done, took 125.89s, learning rate: 4.57e-4
+INFO:root:Epoch loss: 0.1409, Best train loss: 0.1409, Best train accuracy: 93.95%
+INFO:root:Epoch 18 done, took 126.01s, learning rate: 4.57e-4
+INFO:root:Epoch loss: 0.1380, Best train loss: 0.1380, Best train accuracy: 94.09%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1322, Best validation loss: 0.1322, Best validation accuracy: 94.37%
+INFO:root:Start training gru1l128u...
+INFO:root:Epoch 0 done, took 131.39s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1859, Best train loss: 0.1859, Best train accuracy: 92.13%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1718, Best validation loss: 0.1718, Best validation accuracy: 92.78%
+INFO:root:Epoch 1 done, took 129.58s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1702, Best train loss: 0.1702, Best train accuracy: 92.87%
+INFO:root:Epoch 2 done, took 129.13s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1601, Best train loss: 0.1601, Best train accuracy: 93.30%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1509, Best validation loss: 0.1509, Best validation accuracy: 93.63%
+INFO:root:Epoch 3 done, took 129.17s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1509, Best train loss: 0.1509, Best train accuracy: 93.56%
+INFO:root:Epoch 4 done, took 129.26s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1396, Best train loss: 0.1396, Best train accuracy: 93.95%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1322, Best validation loss: 0.1322, Best validation accuracy: 94.27%
+INFO:root:Epoch 5 done, took 129.24s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1331, Best train loss: 0.1331, Best train accuracy: 94.24%
+INFO:root:Epoch 6 done, took 129.32s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1274, Best train loss: 0.1274, Best train accuracy: 94.55%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1192, Best validation loss: 0.1192, Best validation accuracy: 94.98%
+INFO:root:Epoch 7 done, took 129.37s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1219, Best train loss: 0.1219, Best train accuracy: 94.86%
+INFO:root:Epoch 8 done, took 129.12s, learning rate: 5.00e-4
+INFO:root:Epoch loss: 0.1189, Best train loss: 0.1189, Best train accuracy: 95.01%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1131, Best validation loss: 0.1131, Best validation accuracy: 95.26%
+INFO:root:Epoch 9 done, took 129.26s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1168, Best train loss: 0.1168, Best train accuracy: 95.11%
+INFO:root:Epoch 10 done, took 129.25s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1157, Best train loss: 0.1157, Best train accuracy: 95.17%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1097, Best validation loss: 0.1097, Best validation accuracy: 95.43%
+INFO:root:Epoch 11 done, took 129.36s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1131, Best train loss: 0.1131, Best train accuracy: 95.29%
+INFO:root:Epoch 12 done, took 129.32s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1119, Best train loss: 0.1119, Best train accuracy: 95.35%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1084, Best validation loss: 0.1084, Best validation accuracy: 95.51%
+INFO:root:Epoch 13 done, took 129.25s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1104, Best train loss: 0.1104, Best train accuracy: 95.42%
+INFO:root:Epoch 14 done, took 129.66s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1098, Best train loss: 0.1098, Best train accuracy: 95.44%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1050, Best validation loss: 0.1050, Best validation accuracy: 95.64%
+INFO:root:Epoch 15 done, took 129.19s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1089, Best train loss: 0.1089, Best train accuracy: 95.49%
+INFO:root:Epoch 16 done, took 129.42s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1078, Best train loss: 0.1078, Best train accuracy: 95.53%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1036, Best validation loss: 0.1036, Best validation accuracy: 95.71%
+INFO:root:Epoch 17 done, took 129.44s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1070, Best train loss: 0.1070, Best train accuracy: 95.58%
+INFO:root:Epoch 18 done, took 129.34s, learning rate: 4.85e-4
+INFO:root:Epoch loss: 0.1068, Best train loss: 0.1068, Best train accuracy: 95.59%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1030, Best validation loss: 0.1030, Best validation accuracy: 95.72%
+INFO:root:Epoch 19 done, took 129.31s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1057, Best train loss: 0.1057, Best train accuracy: 95.64%
+INFO:root:Epoch 20 done, took 129.36s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1051, Best train loss: 0.1051, Best train accuracy: 95.67%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1017, Best validation loss: 0.1017, Best validation accuracy: 95.80%
+INFO:root:Epoch 21 done, took 129.29s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1046, Best train loss: 0.1046, Best train accuracy: 95.69%
+INFO:root:Epoch 22 done, took 129.21s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1041, Best train loss: 0.1041, Best train accuracy: 95.71%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.1010, Best validation loss: 0.1010, Best validation accuracy: 95.86%
+INFO:root:Epoch 23 done, took 129.16s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1034, Best train loss: 0.1034, Best train accuracy: 95.74%
+INFO:root:Epoch 24 done, took 129.26s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1030, Best train loss: 0.1030, Best train accuracy: 95.76%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0993, Best validation loss: 0.0993, Best validation accuracy: 95.91%
+INFO:root:Epoch 25 done, took 129.26s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1027, Best train loss: 0.1027, Best train accuracy: 95.77%
+INFO:root:Epoch 26 done, took 129.30s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1019, Best train loss: 0.1019, Best train accuracy: 95.81%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0985, Best validation loss: 0.0985, Best validation accuracy: 95.94%
+INFO:root:Epoch 27 done, took 129.28s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1018, Best train loss: 0.1018, Best train accuracy: 95.81%
+INFO:root:Epoch 28 done, took 129.26s, learning rate: 4.70e-4
+INFO:root:Epoch loss: 0.1013, Best train loss: 0.1013, Best train accuracy: 95.83%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0978, Best validation loss: 0.0978, Best validation accuracy: 95.97%
+INFO:root:Epoch 29 done, took 129.27s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.1007, Best train loss: 0.1007, Best train accuracy: 95.85%
+INFO:root:Epoch 30 done, took 129.49s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.1006, Best train loss: 0.1006, Best train accuracy: 95.86%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0976, Best validation loss: 0.0976, Best validation accuracy: 95.97%
+INFO:root:Epoch 31 done, took 129.19s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.1000, Best train loss: 0.1000, Best train accuracy: 95.89%
+INFO:root:Epoch 32 done, took 129.28s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.1008, Best train loss: 0.1000, Best train accuracy: 95.89%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0966, Best validation loss: 0.0966, Best validation accuracy: 96.02%
+INFO:root:Epoch 33 done, took 129.34s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.0992, Best train loss: 0.0992, Best train accuracy: 95.92%
+INFO:root:Epoch 34 done, took 129.26s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.0991, Best train loss: 0.0991, Best train accuracy: 95.92%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0960, Best validation loss: 0.0960, Best validation accuracy: 96.04%
+INFO:root:Epoch 35 done, took 129.23s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.0987, Best train loss: 0.0987, Best train accuracy: 95.94%
+INFO:root:Epoch 36 done, took 129.23s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.0986, Best train loss: 0.0986, Best train accuracy: 95.95%
+INFO:root:Validation loss: 0.0958, Best validation loss: 0.0958, Best validation accuracy: 96.04%
+INFO:root:Epoch 37 done, took 129.32s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.0982, Best train loss: 0.0982, Best train accuracy: 95.96%
+INFO:root:Epoch 38 done, took 129.31s, learning rate: 4.56e-4
+INFO:root:Epoch loss: 0.0978, Best train loss: 0.0978, Best train accuracy: 95.98%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0948, Best validation loss: 0.0948, Best validation accuracy: 96.09%
+INFO:root:Epoch 39 done, took 129.27s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0976, Best train loss: 0.0976, Best train accuracy: 95.99%
+INFO:root:Epoch 40 done, took 129.21s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0972, Best train loss: 0.0972, Best train accuracy: 96.00%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0944, Best validation loss: 0.0944, Best validation accuracy: 96.11%
+INFO:root:Epoch 41 done, took 129.32s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0970, Best train loss: 0.0970, Best train accuracy: 96.01%
+INFO:root:Epoch 42 done, took 129.28s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0967, Best train loss: 0.0967, Best train accuracy: 96.02%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0941, Best validation loss: 0.0941, Best validation accuracy: 96.11%
+INFO:root:Epoch 43 done, took 129.08s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0966, Best train loss: 0.0966, Best train accuracy: 96.03%
+INFO:root:Epoch 44 done, took 129.40s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0963, Best train loss: 0.0963, Best train accuracy: 96.04%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0935, Best validation loss: 0.0935, Best validation accuracy: 96.14%
+INFO:root:Epoch 45 done, took 129.24s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0960, Best train loss: 0.0960, Best train accuracy: 96.06%
+INFO:root:Epoch 46 done, took 129.38s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0958, Best train loss: 0.0958, Best train accuracy: 96.06%
+INFO:root:Validation loss: 0.0946, Best validation loss: 0.0935, Best validation accuracy: 96.14%
+INFO:root:Epoch 47 done, took 129.26s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0959, Best train loss: 0.0958, Best train accuracy: 96.06%
+INFO:root:Epoch 48 done, took 129.28s, learning rate: 4.43e-4
+INFO:root:Epoch loss: 0.0954, Best train loss: 0.0954, Best train accuracy: 96.08%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0929, Best validation loss: 0.0929, Best validation accuracy: 96.17%
+INFO:root:Epoch 49 done, took 129.35s, learning rate: 4.29e-4
+INFO:root:Epoch loss: 0.0952, Best train loss: 0.0952, Best train accuracy: 96.09%
+INFO:root:Epoch 50 done, took 129.22s, learning rate: 4.29e-4
+INFO:root:Epoch loss: 0.0950, Best train loss: 0.0950, Best train accuracy: 96.10%
+WARNING:tensorflow:*******************************************************
+WARNING:tensorflow:TensorFlow's V1 checkpoint format has been deprecated.
+WARNING:tensorflow:Consider switching to the more efficient V2 format:
+WARNING:tensorflow:   `tf.train.Saver(write_version=tf.train.SaverDef.V2)`
+WARNING:tensorflow:now on by default.
+WARNING:tensorflow:*******************************************************
+INFO:root:Validation loss: 0.0928, Best validation loss: 0.0928, Best validation accuracy: 96.17%
+INFO:root:Epoch 51 done, took 129.20s, learning rate: 4.29e-4
+INFO:root:Epoch loss: 0.0947, Best train loss: 0.0947, Best train accuracy: 96.11%
