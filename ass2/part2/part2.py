@@ -24,7 +24,7 @@ BATCH_SIZE = 256
 BATCH_SIZE_EVAL = 2048
 nsample = 100
 
-num_epochs = 21
+num_epochs = 31
 epochs_per_checkpoint = 5
 
 from_pretrained_weights = True
@@ -289,7 +289,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             tst_loss, tst_pred = sess.run([eval_loss, eval_prediction],
                                     feed_dict={eval_data_node: test_batch})
             test_loss += tst_loss / len(test_Batches)
-            accuracy_logistic(tst_pred,test_batch[:,1:]) / len(test_Batches)
+            test_acc += accuracy_logistic(tst_pred,test_batch[:,1:]) / len(test_Batches)
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         Testwriter.writerow([test_loss])
@@ -309,7 +309,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:30000]
+    #train_data = train_data[:30000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.mode!="inpainting":

@@ -20,10 +20,10 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 256
-BATCH_SIZE_EVAL = 256
+BATCH_SIZE = 128
+BATCH_SIZE_EVAL = 128
 
-num_epochs = 26
+num_epochs = 31
 epochs_per_checkpoint = 5
 
 from_pretrained_weights = True
@@ -47,9 +47,9 @@ gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_le
 #models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
 #        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
 #        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-models = {"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
-        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
+models = {"lstm1l64u":lstm1l64u, "lstm3l32u":lstm3l32u,
+        "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+        "gru3l32u": gru3l32u}
 
 
 ######################################## Data processing ########################################
@@ -184,7 +184,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    2*train_size,                       # Decay step.
+                    3*train_size,                       # Decay step.
                     0.99,                               # Decay rate.
                     staircase=True)
 

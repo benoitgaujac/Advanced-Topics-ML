@@ -8,6 +8,9 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 from part2 import data_type
+import inpainting
+
+nsamples = inpainting.nsamples
 
 IMAGE_SIZE = 28
 NUM_CHANNELS = 1
@@ -47,22 +50,23 @@ def base_cell(cell_type="LSTM", nlayers=1, nunits=32, training=False):
 # Sample pixel values from logits
 def get_samples(logits):
     logits_shape = logits.get_shape().as_list()
-    """
-    # get log proba
-    sig = tf.sigmoid(logits)
-    # 1-log proba
-    ones = tf.ones_like(sig,dtype=data_type())
-    sig_ = tf.subtract(ones,sig)
-    unnormalized_prod1 = tf.multiply(sig, logits)
-    unnormalized_prod0 = tf.multiply(sig_, logits)
-    # Unnormalized log probabilities for class 0 or 1
-    proba = tf.stack([tf.log(unnormalized_prod0),tf.log(unnormalized_prod1)],axis=1) #shape [nsamples*batch,2,1]
-    proba = tf.reshape(proba,[-1,2]) #shape [nsamples*batch,2]
-    # sampling
-    samples = tf.multinomial(proba, 1, seed=SEED) #shape [nsamples*batch,1]
-    """
-    bernoulli = tf.contrib.distributions.Bernoulli(logits=logits, dtype=tf.float32)#, logits_shape)
-    samples = bernoulli.sample()
+    log = tf.reshape(logits,[-1,nsamples,1])
+    # Bernoulli sample
+    log_b = log[:,1:,:]
+    bernoulli = tf.contrib.distributions.Bernoulli(logits=log_b, dtype=tf.float32)#, logits_shape)
+    bernoulli_samples = bernoulli.sample()
+    # Most probable sample
+    log_mp = log[:,0,:]
+    mostprobable_samples = get_mostprobable_sample(log_mp)
+    # Concat samples
+    samples = tf.concat(1,[mostprobable_samples,bernoulli_samples])
+    samples = tf.reshape(samples,[logits_shape[0],logits_shape[1],1])
+
+    return samples # reshaping to [nsamples*batch,1,1]
+
+def get_mostprobable_sample(logits):
+    proba = tf.sigmoid(logits)
+    samples = tf.round(proba)
 
     return tf.reshape(samples,[-1,1,1]) # reshaping to [nsamples*batch,1,1]
 
@@ -73,23 +77,6 @@ def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
     #pdb.set_trace()
     # Creating base Cell
     cells = base_cell(cell, nlayers, nunits, training)
-    """
-    if cell=="LSTM":
-        simple_cell = tf.nn.rnn_cell.BasicLSTMCell(nunits)
-    elif cell=="GRU":
-        simple_cell = tf.nn.rnn_cell.GRUCell(nunits)
-    else:
-        raise Exception("Unknown cell type")
-    # dropout
-    if training:
-        simple_cell = tf.nn.rnn_cell.DropoutWrapper(simple_cell,
-                    input_keep_prob=1, output_keep_prob=keep_prob)
-    # Stack Cells if needed
-    if nlayers>1:
-        cells = tf.nn.rnn_cell.MultiRNNCell([simple_cell] * nlayers)
-    else:
-        cells = simple_cell
-    """
     # Build RNN network
     seq_lent = IMAGE_SIZE*IMAGE_SIZE * np.ones([imshape[0]])
     outputs, state = tf.nn.dynamic_rnn(cells, images_embedded, dtype=data_type(), sequence_length=seq_lent) # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
@@ -110,23 +97,6 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
     imshape = images_embedded.get_shape().as_list()
     # Creating base Cell
     cells = base_cell(cell, nlayers, nunits, training)
-    """
-    if cell=="LSTM":
-        simple_cell = tf.nn.rnn_cell.BasicLSTMCell(nunits)
-    elif cell=="GRU":
-        simple_cell = tf.nn.rnn_cell.GRUCell(nunits)
-    else:
-        raise Exception("Unknown cell type")
-    # dropout
-    if training:
-        simple_cell = tf.nn.rnn_cell.DropoutWrapper(simple_cell,
-                    input_keep_prob=1, output_keep_prob=keep_prob)
-    # Stack Cells if needed
-    if nlayers>1:
-        cells = tf.nn.rnn_cell.MultiRNNCell([simple_cell] * nlayers)
-    else:
-        cells = simple_cell
-    """
     # Build RNN network
     seq_lent = imshape[1] * np.ones([imshape[0]])
     with tf.variable_scope(name) as scope:
@@ -149,6 +119,7 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
         seq_lent = np.ones([inputs_shape[0]])
         scope.reuse_variables()
         for i in range(300):
+            # sample from bernuolli logits
             out, state = tf.nn.dynamic_rnn(cells, inputs,  # out shape [nsamples*batch,1,nunits]
                                         dtype=data_type(),
                                         sequence_length=seq_lent,
