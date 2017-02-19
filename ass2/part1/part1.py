@@ -24,13 +24,13 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 128
-BATCH_SIZE_EVAL = 128
+BATCH_SIZE = 256
+BATCH_SIZE_EVAL = 256
 
-num_epochs = 3
-epochs_per_checkpoint = 1
+num_epochs = 100
+epochs_per_checkpoint = 2
 
-from_pretrained_weights = True
+from_pretrained_weights = False
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -190,7 +190,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    3*train_size,                       # Decay step.
+                    5*train_size,                       # Decay step.
                     0.99,                               # Decay rate.
                     staircase=True)
 
@@ -225,8 +225,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 learning_rate = tf.train.exponential_decay(
                                 model_archi["init_learning_rate"],  # Base learning rate.
                                 batch * BATCH_SIZE,                 # Current index into the dataset.
-                                10*train_size,                       # Decay step.
-                                0.98,                               # Decay rate.
+                                5*train_size,                       # Decay step.
+                                0.99,                               # Decay rate.
                                 staircase=True)
 
             # Training
@@ -312,7 +312,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
 if __name__ == '__main__':
     logging.basicConfig(filename='out.log', level=logging.DEBUG)
-    
+
     ###### Load and get data ######
     train_data, train_labels, validation_data, validation_labels, test_data, test_labels = get_data()
     train_data = np.reshape(train_data,[-1,IMAGE_SIZE*IMAGE_SIZE])
@@ -326,8 +326,8 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    train_data = train_data[:1000]
-    train_labels = train_labels[:1000]
+    #train_data = train_data[:1000]
+    #train_labels = train_labels[:1000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
