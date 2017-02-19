@@ -9,6 +9,7 @@ import csv
 from sklearn.utils import shuffle
 from PIL import Image
 import matplotlib.pyplot as plt
+import scipy.io
 import tensorflow as tf
 
 import build_model
@@ -17,7 +18,7 @@ import part2
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
 SEED = 66478  # Set to None for random seed.
-nsamples = 11
+nsamples = part2.nsamples
 
 ######################################## Utils functions ########################################
 def get_loss(logits,targets,targets_GT=False):
@@ -30,6 +31,7 @@ def get_loss(logits,targets,targets_GT=False):
     # Reshapping logits
     log = tf.stack(logits,axis=0) # log shape: [300,nsamples*nbsample,1]
     log = tf.reshape(tf.transpose(log,perm=[1,0,2]),[-1,300]) # log shape: [nsamples*nbsample,300]
+    nsample = int(float(log.get_shape().as_list()[0])/nsamples)
     # Reshapping targets
     if not targets_GT:
         tar = tf.stack(targets,axis=0) # tar shape: [300,nsamples*nbsample,1]
@@ -37,14 +39,16 @@ def get_loss(logits,targets,targets_GT=False):
     elif targets_GT:
         tar = tf.tile(targets,[1,nsamples]) # tar shape: [nbsample,300*nsamples]
         tar = tf.reshape(tar,[-1,300]) # tar shape: [nsamples*nbsample,300]
-    loss_300 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log))
-    """
-    loss_28 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar[:,:28],logits=log[:,:28]))
-    loss_10 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar[:,:10],logits=log[:,:10]))
-    loss_1 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar[:,1],logits=log[:,1]))
-    return [loss_300, loss_28, loss_10, loss_1]
-    """
-    return loss_300
+    # Xentropy for each images (nsamples*nbsample images)
+    sig_Xentropy = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log),1)
+    # mean loss
+    loss = tf.reduce_mean(sig_Xentropy)
+    # Xentropy for each images as average over nsamples
+    Xentropy = tf.reshape(sig_Xentropy,[nsample,nsamples,-1])
+    samples_Xentropy = tf.reduce_mean(Xentropy,1)
+    #samples_Xentropy = tf.split(0,mean_Xentropy.get_shape().as_list()[0],mean_Xentropy)
+    #loss_300 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log))
+    return loss, samples_Xentropy
 
 def inpaint_images(data, idx, predictions, npixels):
     data_shape = np.shape(data)
@@ -144,8 +148,8 @@ def in_painting(model_archi,gt_data,cache_data):
                                                             nsamples=nsamples,
                                                             training=False)
 
-    grtr_cross_entropy = get_loss(logits=test_logits,targets=test_data_node[:,-300:],targets_GT=True)
-    pred_cross_entropy = get_loss(logits=test_logits,targets=test_pred)
+    grtr_mean_Xentropy, grtr_samples_Xentropy = get_loss(logits=test_logits,targets=test_data_node[:,-300:],targets_GT=True)
+    pred_mean_Xentropy, pred_samples_Xentropy = get_loss(logits=test_logits,targets=test_pred)
 
     saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
     """
@@ -174,15 +178,25 @@ def in_painting(model_archi,gt_data,cache_data):
             raise Exception("no weights given")
         saver.restore(sess, DST)
         # Compute and print results once training is done
+        to_compute = [grtr_mean_Xentropy, grtr_samples_Xentropy,
+                    pred_mean_Xentropy, pred_samples_Xentropy, test_pred]
+        results = sess.run(to_compute, feed_dict={test_data_node: gt_data, cache_data_node: cache_data})
+
+        """
         prediction_XE, GroundTruth_XE, pix_pred = sess.run(
                                             [grtr_cross_entropy, pred_cross_entropy,test_pred],
                                             feed_dict={test_data_node: gt_data,
                                             cache_data_node: cache_data})
-
+        """
         print("Testing done, took: {:.4f}s".format(time.time()-start_time))
-        print("predicted Xent 300: {:.4f}, ground-truth Xent 300: {:.4f}".format(prediction_XE,GroundTruth_XE))
-        Testwriter.writerow([prediction_XE,GroundTruth_XE])
-
+        #print("predicted Xent 300: {:.4f}, ground-truth Xent 300: {:.4f}".format(prediction_XE,GroundTruth_XE))
+        print("predicted Xent 300: {:.4f}, ground-truth Xent 300: {:.4f}".format(results[0],results[2]))
+        # Save Xentropy
+        Testwriter.writerow([results[0],results[2]])
+        FILE_NAME = "Perf/GT_Xentropy_" + str(nn_model) + ".mat"
+        scipy.io.savemat(FILE_NAME, {'mat':results[1]})
+        FILE_NAME = "Perf/PR_Xentropy_" + str(nn_model) + ".mat"
+        scipy.io.savemat(FILE_NAME, {'mat':results[3]})
 
         # in painting images and save
         print("\nStart inpainting...")
@@ -198,6 +212,6 @@ def in_painting(model_archi,gt_data,cache_data):
         #npixels = [1, 10, 28, 300]
         for npixel in npixels:
             #inpainting_images = inpaint_images(gt_data, idxtosave, test_list, npixel)
-            inpainting_images = inpaint_images(gt_data, idxtosave, pix_pred, npixel)
+            inpainting_images = inpaint_images(gt_data, idxtosave, results[-1], npixel)
             NB_PIX = str(npixel) + "pixels"
             save_images(inpainting_images,NB_PIX)

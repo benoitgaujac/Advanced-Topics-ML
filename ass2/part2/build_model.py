@@ -5,12 +5,11 @@ import pdb
 
 import numpy as np
 from six.moves import urllib
-from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 from part2 import data_type
-import inpainting
+#import inpainting
 
-nsamples = inpainting.nsamples
+nsamples = part2.nsamples
 
 IMAGE_SIZE = 28
 NUM_CHANNELS = 1

@@ -1,3 +1,0 @@
-Num Epoch;Time;Training loss;Validation loss
-1;35.47767210006714;0.104201383889;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)"
-2;30.02875804901123;0.104294074699;"Tensor(""gru1l32u/Mean_1:0"", shape=(), dtype=float32)"

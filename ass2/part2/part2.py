@@ -5,12 +5,16 @@ import time
 import pdb
 
 import numpy as np
-from six.moves import urllib
-import tensorflow as tf
-import build_model
-import inpainting
 import csv
+from six.moves import urllib
 from sklearn.utils import shuffle
+import tensorflow as tf
+
+import logging
+logging.basicConfig(filename='out.log', level=logging.DEBUG)
+
+import build_model
+#import inpainting
 
 
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
@@ -23,6 +27,7 @@ SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 256
 BATCH_SIZE_EVAL = 2048
 nsample = 100
+nsamples = 11
 
 num_epochs = 31
 epochs_per_checkpoint = 5
@@ -233,7 +238,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             best_train_loss, best_eval_loss = 10000.0, 10000.0
             best_train_acc, best_eval_acc = 0.0, 0.0
             #training loop
-            print("Start training...")
+            print("Start training {}...".format(nn_model))
+            logging.info("Start training {}...".format(nn_model))
             for epoch in range(num_epochs):
                 start_time = time.time()
                 train_loss, train_acc = 0.0, 0.0
@@ -250,11 +256,14 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     train_acc += accuracy_logistic(predictions,batch_[:,1:]) / len(Batches)
                 # Print info for previous epoch
                 print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
+                logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 if train_acc>best_train_acc:
                     best_train_acc = train_acc
                 if train_loss<best_train_loss:
                     best_train_loss = train_loss
                 print("Epoch loss: {:.4f}, Best train loss: {:.4f}, Best train accuracy: {:.2f}%".format(
+                                                            train_loss,best_train_loss,best_train_acc*100))
+                logging.info("Epoch loss: {:.4f}, Best train loss: {:.4f}, Best train accuracy: {:.2f}%".format(
                                                             train_loss,best_train_loss,best_train_acc*100))
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
@@ -271,6 +280,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     if eval_loss_<best_eval_loss:
                         best_eval_loss = eval_loss_
                     print("Validation loss: {:.4f}, Best validation loss: {:.4f}, Best validation accuracy: {:.2f}%".format(
+                                                                                    eval_loss_,best_eval_loss,best_eval_acc*100))
+                    logging.info("Validation loss: {:.4f}, Best validation loss: {:.4f}, Best validation accuracy: {:.2f}%".format(
                                                                                     eval_loss_,best_eval_loss,best_eval_acc*100))
                     sys.stdout.flush()
                 # Writing csv file with results and saving models
@@ -292,6 +303,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             test_acc += accuracy_logistic(tst_pred,test_batch[:,1:]) / len(test_Batches)
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
+        logging.info("\nTest loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         Testwriter.writerow([test_loss])
 
 if __name__ == '__main__':
