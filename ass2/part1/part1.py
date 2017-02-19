@@ -148,7 +148,6 @@ def get_batches(images, labels, batch_size=BATCH_SIZE):
 ######################################## Main ########################################
 def main(model_archi,train_data, train_labels, validation_data, validation_labels, test_data, test_labels, mode_):
 
-    logging.basicConfig(filename='out.log', level=logging.DEBUG)
 
     nn_model = model_archi["name"]
     # Create weights dst DIR
@@ -312,6 +311,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
         sess.close()
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='out.log', level=logging.DEBUG)
+    
     ###### Load and get data ######
     train_data, train_labels, validation_data, validation_labels, test_data, test_labels = get_data()
     train_data = np.reshape(train_data,[-1,IMAGE_SIZE*IMAGE_SIZE])
