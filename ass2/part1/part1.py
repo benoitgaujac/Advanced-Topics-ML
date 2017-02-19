@@ -13,7 +13,7 @@ from sklearn.utils import shuffle
 import build_model
 
 import logging
-logging.basicConfig(filename='out.log', level=logging.DEBUG)
+
 
 
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
@@ -147,6 +147,9 @@ def get_batches(images, labels, batch_size=BATCH_SIZE):
 
 ######################################## Main ########################################
 def main(model_archi,train_data, train_labels, validation_data, validation_labels, test_data, test_labels, mode_):
+
+    logging.basicConfig(filename='out.log', level=logging.DEBUG)
+
     nn_model = model_archi["name"]
     # Create weights dst DIR
     DST = create_DST_DIT(nn_model)
