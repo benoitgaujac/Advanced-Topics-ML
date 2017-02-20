@@ -24,13 +24,13 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 256
-BATCH_SIZE_EVAL = 2048
+BATCH_SIZE = 512
+BATCH_SIZE_EVAL = 512
 nsample = 100
 nsamples = 11
 
-num_epochs = 51
-epochs_per_checkpoint =50
+num_epochs = 100
+epochs_per_checkpoint =3
 
 from_pretrained_weights = True
 
@@ -42,21 +42,14 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="train, test or inpainting mode")
 
 ######################################## Models architectures ########################################
-#lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.00095}
-#lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0002}
-#lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0002}
-#lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.00095}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.2}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.01}
 gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.001}
 gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
 gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.01}
-"""
-models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
-        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+
+models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
         "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-"""
-models = {"gru1l32u":gru1l32u, "gru1l64u": gru1l64u,
-        "gru1l128u": gru1l128u , "gru3l32u": gru3l32u}
+
 #models = {"gru1l32u":gru1l32u,}
 
 ######################################## Data processing ########################################
@@ -194,19 +187,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                                 targets=eval_data_node[:,1:],
                                                 logits=eval_logits))
 
-    """
-    ###### Create varaible for batch ######
-    batch = tf.Variable(0, dtype=data_type())
-    ###### CLearning rate decay ######
-    learning_rate = tf.train.exponential_decay(
-                    model_archi["init_learning_rate"],  # Base learning rate.
-                    batch * BATCH_SIZE,                 # Current index into the dataset.
-                    2*train_size,                       # Decay step.
-                    0.99,                               # Decay rate.
-                    staircase=True)
-    ###### Optimizer ######
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-    """
     ###### Optimizer ######
     learning_rate = tf.placeholder(tf.float32, shape=[])
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
@@ -215,9 +195,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     ###### Predictions for the validation ######
     eval_prediction = tf.sigmoid(eval_logits)
     ###### Saver ######
-    #saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
     saver = tf.train.Saver()
-
 
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
@@ -232,15 +210,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)
-                tf.variables_initializer([learning_rate,]).run()
-                """
-                learning_rate = tf.train.exponential_decay(
-                                model_archi["init_learning_rate"],  # Base learning rate.
-                                batch * BATCH_SIZE,                 # Current index into the dataset.
-                                10*train_size,                       # Decay step.
-                                0.97,                               # Decay rate.
-                                staircase=True)
-                """
 
             # initialize performance indicators
             loss_history = [10000.0,]
@@ -262,29 +231,27 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     feed_dict = {train_data_node: batch_, learning_rate: lr}
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
-                    #l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
                     l, predictions = sess.run([loss, train_prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
                     train_acc += accuracy_logistic(predictions,batch_[:,1:]) / len(Batches)
-                # Print info for previous epoch
-                #print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
-                #logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
-                print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
-                logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
                 if train_acc>best_train_acc:
                     best_train_acc = train_acc
                 if train_loss<best_train_loss:
                     best_train_loss = train_loss
+                # Print info for previous epoch
+                print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
+                logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
                 print("Epoch loss: {:.4f}, Best train loss: {:.4f}, Best train accuracy: {:.2f}%".format(
                                                             train_loss,best_train_loss,best_train_acc*100))
                 logging.info("Epoch loss: {:.4f}, Best train loss: {:.4f}, Best train accuracy: {:.2f}%".format(
                                                             train_loss,best_train_loss,best_train_acc*100))
                 # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
+                #eps = float(best_train_loss)/100
                 loss_history.append(train_loss)
-                if len(loss_history)>3:
+                if len(loss_history)>2:
                     loss_history.pop(0)
-                if best_train_loss==loss_history[0]:
+                if loss_history[0]==min(loss_history) and best_train_loss < min(loss_history):
                     lr = float(lr)/2
 
                 # Perform evaluation
@@ -345,7 +312,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:2000]
+    #train_data = train_data[:1000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.mode!="inpainting":

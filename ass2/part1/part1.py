@@ -40,14 +40,14 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.001}
-lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0005}
-lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.0005}
-lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.001}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.005}
+lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.001}
+lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.001}
+lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.005}
 gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.0005}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.0005}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.001}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.001}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.005}
 #models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
 #        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
 #        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
@@ -263,15 +263,15 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
                     train_acc += accuracy(predictions,batch_[1]) / len(Batches)
+                if train_acc>best_train_acc:
+                    best_train_acc = train_acc
+                if train_loss<best_train_loss:
+                    best_train_loss = train_loss
                 # Print info for previous epoch
                 #print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 #logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
                 logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
-                if train_acc>best_train_acc:
-                    best_train_acc = train_acc
-                if train_loss<best_train_loss:
-                    best_train_loss = train_loss
                 print("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
                 print("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
                 logging.info("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
@@ -280,7 +280,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 loss_history.append(train_loss)
                 if len(loss_history)>3:
                     loss_history.pop(0)
-                if best_train_loss==loss_history[0]:
+                if loss_history[0]==min(loss_history) and best_train_loss < min(loss_history):
                     lr = float(lr)/2
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
