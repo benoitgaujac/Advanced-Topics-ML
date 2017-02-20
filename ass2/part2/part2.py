@@ -47,10 +47,11 @@ gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_le
 gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
 gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.01}
 
-models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
+#models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+#        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
 
-#models = {"gru1l32u":gru1l32u,}
+models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+        "gru1l128u": gru1l128u}
 
 ######################################## Data processing ########################################
 def data_type():
@@ -249,7 +250,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
                 eps = float(best_train_loss)/50
                 fct = 2
-                if epoch>49:
+                if epoch>30:
                     fct=10
                 loss_history.append(train_loss)
                 if len(loss_history)>2:
