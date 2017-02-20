@@ -282,9 +282,9 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 if epoch>49:
                     fct=10
                 loss_history.append(train_loss)
-                if len(loss_history)>2:
+                if len(loss_history)>5:
                     loss_history.pop(0)
-                if loss_history[0]==min(loss_history) and best_train_loss - eps < min(loss_history):
+                if best_train_loss - eps < min(loss_history):
                     lr = float(lr)/fct
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
