@@ -1,0 +1,2 @@
+Num Epoch;Time;Training loss;Validation loss
+1;144.35921597480774;0.341719655527;"Tensor(""gru1l128u/Mean_1:0"", shape=(), dtype=float32)"
