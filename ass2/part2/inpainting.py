@@ -33,12 +33,6 @@ def get_loss(logits,targets,targets_GT=False):
     log = tf.stack(logits,axis=0) # log shape: [300,nsamples*nbsample,1]
     log = tf.reshape(tf.transpose(log,perm=[1,0,2]),[-1,300]) # log shape: [nsamples*nbsample,300]
     # Reshapping targets
-    """
-    nsample = int(float(log.get_shape().as_list()[0])/nsamples)
-    if not targets_GT:
-        tar = tf.stack(targets,axis=0) # tar shape: [300,nsamples*nbsample,1]
-        tar = tf.reshape(tf.transpose(tar,perm=[1,0,2]),[-1,300]) # tar shape: [nsamples*nbsample,300]
-    """
     if targets_GT:
         tar = tf.tile(targets,[1,nsamples]) # tar shape: [nbsample,300*nsamples]
         tar = tf.reshape(tar,[-1,300]) # tar shape: [nsamples*nbsample,300]
@@ -51,8 +45,6 @@ def get_loss(logits,targets,targets_GT=False):
     # Xentropy for each images as average over nsamples
     Xentropy = tf.reshape(sig_Xentropy,[nsample,nsamples,-1])
     samples_Xentropy = tf.reduce_mean(Xentropy,1)
-    #samples_Xentropy = tf.split(0,mean_Xentropy.get_shape().as_list()[0],mean_Xentropy)
-    #loss_300 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log))
     return loss, samples_Xentropy
 
 def process_images(data, idx, predictions, npixels):
@@ -71,37 +63,13 @@ def process_images(data, idx, predictions, npixels):
     tilded_cache_data = np.reshape(tilded_cache_data,[nbtodraw*nsamples,-1]) #shape: [nbtodraw*nsamples,28x28]
     cache_data_tostack = np.reshape(cache_data,[nbtodraw,-1,1])
     # preprocess predictions
-    """
-    preds = tf.stack(predictions,axis=1) #shape: [nsamplesxnbsample,300,1]
-    preds = tf.reshape(preds,[data_shape[0]*nsamples,-1]) #shape: [nsamplesxnbsample,300]
-    preds= preds.eval() #convert tensor to ndarray
-    preds = np.split(preds, data_shape[0], 0) #shape: nbsamples*[nsample, 300]
-    preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 300]
-    preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 300]
-    preds_todraw = np.reshape(preds_todraw, [nbtodraw*nsamples,-1]) #shape: [nbtodraw*nbsamples, 300]
-    """
-
     preds = tf.reshape(predictions,[-1,data_shape[1]]) #shape: [nsamplesxnbsample,28x28]
     preds= preds.eval() #convert tensor to ndarray
     preds = np.split(preds, data_shape[0], 0) #shape: nbsamples*[nsample, 28x28]
     preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 28x28]
     preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 28x28]
     preds_todraw = im_pred = np.transpose(preds_todraw,[0,2,1]) #shape: [nbtodraw, 28x28, nsamples]
-
-    """
-    # create images to inpaint
-    im_pred = tilded_cache_data
-    # replacing original by prediction
-    if npixels==300:
-        im_pred[:,-300:] = preds_todraw[:,:npixels] #shape: [nbtodraw*nsamples, 28x28]
-    else:
-        im_pred[:,-300:-300+npixels] = preds_todraw[:,:npixels]  #shape: [nbtodraw*nsamples, 28x28]
-    im_pred = np.reshape(im_pred,[nbtodraw,nsamples,-1]) #shape: [nbtodraw,nsamples, 28x28]
-    im_pred = np.transpose(im_pred,[0,2,1]) #shape: [nbtodraw, 28x28, nsamples]
-    """
     # stacking all the images, first filter is the original, second is the cache, remaining are the predictions
-    #images = np.concatenate((original_data_tostack,cache_data_tostack,im_pred), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
-    pdb.set_trace
     images = np.concatenate((original_data_tostack,cache_data_tostack,preds_todraw), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
     images = np.reshape(images,[nbtodraw,IMAGE_SIZE,IMAGE_SIZE,-1])*255.0 #shape: [nbtodraw, 28, 28, 2+nbsamples]
     return images.astype("int32")
