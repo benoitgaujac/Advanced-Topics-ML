@@ -112,7 +112,7 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
         # sample nsamples pixel values from last output
         inputs = get_samples(last_out) # inputs shape [nsamples*batch,1,1]
         # list of pixels predictions and pixels logits
-        im_pred = np.concatenate((images_embedded,tf.reshape(inputs,[-1,1])), axis=1)
+        im_pred = tf.concat(1,[images_embedded,inputs])
         #out_predictions = [tf.reshape(inputs,[-1,1]),]
         out_logits = [last_out,]
         # run the RNN throught the hidden 300 last pixels
@@ -129,7 +129,7 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
             out = tf.matmul(out,weight_class) + biais_class # out shape: [nsamples*batch,1]
             out_logits.append(out)
             inputs = get_samples(out) # inputs shape [nsamples*batch,1,1]
-            im_pred = np.concatenate((im_pred,tf.reshape(inputs,[-1,1])), axis=1)
+            im_pred = tf.concat(1,[im_pred,inputs])
             #out_predictions.append(tf.reshape(inputs,[-1,1])) # prediction shape: [nsamples*batch,1]
 
     # out_logits is list of lenth 300 of output logits [nsamples*batch,1]

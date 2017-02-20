@@ -277,11 +277,15 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 logging.info("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
                 logging.info("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
                 # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
+                eps = float(best_train_loss)/20
+                fct = 2
+                if epoch>49:
+                    fct=10
                 loss_history.append(train_loss)
-                if len(loss_history)>3:
+                if len(loss_history)>2:
                     loss_history.pop(0)
-                if loss_history[0]==min(loss_history) and best_train_loss < min(loss_history):
-                    lr = float(lr)/2
+                if loss_history[0]==min(loss_history) and best_train_loss - eps < min(loss_history):
+                    lr = float(lr)/fct
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
                     eval_loss_, eval_acc = 0.0, 0.0
