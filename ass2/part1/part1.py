@@ -277,7 +277,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 logging.info("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
                 logging.info("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
                 # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
-                eps = float(best_train_loss)/20
+                eps = float(best_train_loss)/50
                 fct = 2
                 if epoch>49:
                     fct=10
