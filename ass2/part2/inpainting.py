@@ -32,14 +32,18 @@ def get_loss(logits,targets,targets_GT=False):
     # Reshapping logits
     log = tf.stack(logits,axis=0) # log shape: [300,nsamples*nbsample,1]
     log = tf.reshape(tf.transpose(log,perm=[1,0,2]),[-1,300]) # log shape: [nsamples*nbsample,300]
-    nsample = int(float(log.get_shape().as_list()[0])/nsamples)
     # Reshapping targets
+    """
+    nsample = int(float(log.get_shape().as_list()[0])/nsamples)
     if not targets_GT:
         tar = tf.stack(targets,axis=0) # tar shape: [300,nsamples*nbsample,1]
         tar = tf.reshape(tf.transpose(tar,perm=[1,0,2]),[-1,300]) # tar shape: [nsamples*nbsample,300]
-    elif targets_GT:
+    """
+    if targets_GT:
         tar = tf.tile(targets,[1,nsamples]) # tar shape: [nbsample,300*nsamples]
         tar = tf.reshape(tar,[-1,300]) # tar shape: [nsamples*nbsample,300]
+    else:
+        tar = tf.reshape(targets[:,-300:],[-1,300])
     # Xentropy for each images (nsamples*nbsample images)
     sig_Xentropy = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log),1)
     # mean loss
@@ -67,6 +71,7 @@ def process_images(data, idx, predictions, npixels):
     tilded_cache_data = np.reshape(tilded_cache_data,[nbtodraw*nsamples,-1]) #shape: [nbtodraw*nsamples,28x28]
     cache_data_tostack = np.reshape(cache_data,[nbtodraw,-1,1])
     # preprocess predictions
+    """
     preds = tf.stack(predictions,axis=1) #shape: [nsamplesxnbsample,300,1]
     preds = tf.reshape(preds,[data_shape[0]*nsamples,-1]) #shape: [nsamplesxnbsample,300]
     preds= preds.eval() #convert tensor to ndarray
@@ -74,6 +79,15 @@ def process_images(data, idx, predictions, npixels):
     preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 300]
     preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 300]
     preds_todraw = np.reshape(preds_todraw, [nbtodraw*nsamples,-1]) #shape: [nbtodraw*nbsamples, 300]
+    """
+
+    preds = tf.reshape(predictions,[-1,data_shape[1]]) #shape: [nsamplesxnbsample,28x28]
+    preds= preds.eval() #convert tensor to ndarray
+    preds = np.split(preds, data_shape[0], 0) #shape: nbsamples*[nsample, 28x28]
+    preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 28x28]
+    preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 28x28]
+    preds_todraw = im_pred = np.transpose(preds_todraw,[0,2,1]) #shape: [nbtodraw, 28x28, nsamples]
+
     """
     # create images to inpaint
     im_pred = tilded_cache_data
@@ -87,6 +101,7 @@ def process_images(data, idx, predictions, npixels):
     """
     # stacking all the images, first filter is the original, second is the cache, remaining are the predictions
     #images = np.concatenate((original_data_tostack,cache_data_tostack,im_pred), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
+    pdb.set_trace
     images = np.concatenate((original_data_tostack,cache_data_tostack,preds_todraw), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
     images = np.reshape(images,[nbtodraw,IMAGE_SIZE,IMAGE_SIZE,-1])*255.0 #shape: [nbtodraw, 28, 28, 2+nbsamples]
     return images.astype("int32")
@@ -151,11 +166,12 @@ def in_painting(model_archi,gt_data,cache_data):
                                                             nunits=model_archi["units"],
                                                             nsamples=nsamples,
                                                             training=False)
-
     grtr_mean_Xentropy, grtr_samples_Xentropy = get_loss(logits=test_logits,targets=test_data_node[:,-300:],targets_GT=True)
     pred_mean_Xentropy, pred_samples_Xentropy = get_loss(logits=test_logits,targets=test_pred)
 
-    saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
+    #saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
+    saver = tf.train.Saver()
+
     """
     vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
     name_vars = [v.name for v in vars_]
@@ -178,14 +194,13 @@ def in_painting(model_archi,gt_data,cache_data):
         Testwriter.writerow(['Predict CE 300','Grount truth CE 300'])
 
         # Testing
-        if not tf.gfile.Exists(DST):
-            raise Exception("no weights given")
+        #if not tf.gfile.Exists(DST):
+        #    raise Exception("no weights given")
         saver.restore(sess, DST)
         # Compute and print results once training is done
         to_compute = [grtr_mean_Xentropy, grtr_samples_Xentropy,
                     pred_mean_Xentropy, pred_samples_Xentropy, test_pred]
         results = sess.run(to_compute, feed_dict={test_data_node: gt_data, cache_data_node: cache_data})
-
         """
         prediction_XE, GroundTruth_XE, pix_pred = sess.run(
                                             [grtr_cross_entropy, pred_cross_entropy,test_pred],
