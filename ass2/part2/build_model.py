@@ -9,14 +9,15 @@ import tensorflow as tf
 import part2
 #import inpainting
 
-nsamples = part2.nsamples
+nsample = 100
+nsamples = 11
 
 IMAGE_SIZE = 28
 NUM_CHANNELS = 1
 NUM_LABELS = 1
 SEED = 66478  # Set to None for random seed.
 #fully_connected_neurons = 256
-keep_prob = .7
+keep_prob = .5
 
 ######################################## Utils functions ########################################
 def weight_variable(shape,name,layer):
@@ -111,7 +112,8 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
         # sample nsamples pixel values from last output
         inputs = get_samples(last_out) # inputs shape [nsamples*batch,1,1]
         # list of pixels predictions and pixels logits
-        out_predictions = [tf.reshape(inputs,[-1,1]),]
+        im_pred = np.concatenate((images_embedded,tf.reshape(inputs,[-1,1])), axis=1)
+        #out_predictions = [tf.reshape(inputs,[-1,1]),]
         out_logits = [last_out,]
         # run the RNN throught the hidden 300 last pixels
         inputs_shape = inputs.get_shape().as_list()
@@ -127,8 +129,9 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
             out = tf.matmul(out,weight_class) + biais_class # out shape: [nsamples*batch,1]
             out_logits.append(out)
             inputs = get_samples(out) # inputs shape [nsamples*batch,1,1]
-            out_predictions.append(tf.reshape(inputs,[-1,1])) # prediction shape: [nsamples*batch,1]
+            im_pred = np.concatenate((im_pred,tf.reshape(inputs,[-1,1])), axis=1)
+            #out_predictions.append(tf.reshape(inputs,[-1,1])) # prediction shape: [nsamples*batch,1]
 
     # out_logits is list of lenth 300 of output logits [nsamples*batch,1]
     # out_predictions is list of lenth 300 of predicted pixels [nsamples*batch,1]
-    return out_logits[:-1], out_predictions[:-1]
+    return out_logits[:-1], im_pred[:,:-1] #out_predictions[:-1]

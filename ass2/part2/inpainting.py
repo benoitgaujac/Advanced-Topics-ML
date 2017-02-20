@@ -18,7 +18,8 @@ import part2
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
 SEED = 66478  # Set to None for random seed.
-nsamples = part2.nsamples
+nsample = 100
+nsamples = 11
 
 ######################################## Utils functions ########################################
 def get_loss(logits,targets,targets_GT=False):
@@ -50,7 +51,7 @@ def get_loss(logits,targets,targets_GT=False):
     #loss_300 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(targets=tar,logits=log))
     return loss, samples_Xentropy
 
-def inpaint_images(data, idx, predictions, npixels):
+def process_images(data, idx, predictions, npixels):
     data_shape = np.shape(data)
     nbtodraw = np.shape(idx)[0]
     # Original
@@ -73,6 +74,7 @@ def inpaint_images(data, idx, predictions, npixels):
     preds = np.stack(preds,axis=0) #shape: [nsample, nbsamples, 300]
     preds_todraw = np.take(preds,idx,axis=0) #shape: [nbtodraw, nbsamples, 300]
     preds_todraw = np.reshape(preds_todraw, [nbtodraw*nsamples,-1]) #shape: [nbtodraw*nbsamples, 300]
+    """
     # create images to inpaint
     im_pred = tilded_cache_data
     # replacing original by prediction
@@ -82,8 +84,10 @@ def inpaint_images(data, idx, predictions, npixels):
         im_pred[:,-300:-300+npixels] = preds_todraw[:,:npixels]  #shape: [nbtodraw*nsamples, 28x28]
     im_pred = np.reshape(im_pred,[nbtodraw,nsamples,-1]) #shape: [nbtodraw,nsamples, 28x28]
     im_pred = np.transpose(im_pred,[0,2,1]) #shape: [nbtodraw, 28x28, nsamples]
+    """
     # stacking all the images, first filter is the original, second is the cache, remaining are the predictions
-    images = np.concatenate((original_data_tostack,cache_data_tostack,im_pred), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
+    #images = np.concatenate((original_data_tostack,cache_data_tostack,im_pred), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
+    images = np.concatenate((original_data_tostack,cache_data_tostack,preds_todraw), axis=2) #shape: [nbtodraw, 28x28, 2+nbsamples]
     images = np.reshape(images,[nbtodraw,IMAGE_SIZE,IMAGE_SIZE,-1])*255.0 #shape: [nbtodraw, 28, 28, 2+nbsamples]
     return images.astype("int32")
 
@@ -212,6 +216,6 @@ def in_painting(model_archi,gt_data,cache_data):
         #npixels = [1, 10, 28, 300]
         for npixel in npixels:
             #inpainting_images = inpaint_images(gt_data, idxtosave, test_list, npixel)
-            inpainting_images = inpaint_images(gt_data, idxtosave, results[-1], npixel)
+            inpainting_images = process_images(gt_data, idxtosave, results[-1], npixel)
             NB_PIX = str(npixel) + "pixels"
             save_images(inpainting_images,NB_PIX)
