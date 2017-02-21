@@ -27,8 +27,8 @@ SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 256
 BATCH_SIZE_EVAL = 256
 
-num_epochs = 100
-epochs_per_checkpoint = 2
+num_epochs = 75
+epochs_per_checkpoint = 3
 
 from_pretrained_weights = False
 
@@ -220,7 +220,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
             Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Training accuracy', 'Validation loss','Validation accuracy'])
 
             # Load pre trained models
-            if not tf.gfile.Exists(DST) or not from_pretrained_weights:
+            if not tf.gfile.Exists(DST+ ".meta") or not from_pretrained_weights:
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)

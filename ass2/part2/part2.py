@@ -29,10 +29,10 @@ BATCH_SIZE_EVAL = 512
 nsample = 100
 nsamples = 11
 
-num_epochs = 100
+num_epochs = 75
 epochs_per_checkpoint =3
 
-from_pretrained_weights = False
+from_pretrained_weights = True
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -218,7 +218,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             Trainwriter = csv.writer(csvfileTrain, delimiter=';',)
             Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Validation loss'])
             # Load pre trained model if exist
-            if not tf.gfile.Exists(DST) or not from_pretrained_weights:
+            if not tf.gfile.Exists(DST + ".meta") or not from_pretrained_weights:
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)
@@ -345,7 +345,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    #train_data = train_data[:1000]
+    train_data = train_data[:10000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.mode!="inpainting":
