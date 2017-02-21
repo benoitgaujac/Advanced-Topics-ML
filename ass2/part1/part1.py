@@ -40,14 +40,14 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.005}
-lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.001}
-lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.001}
-lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.005}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.001}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.01}
+lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.005}
+lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.005}
+lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.01}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.01}
 gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.001}
 gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.005}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.01}
 #models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
 #        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
 #        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
@@ -185,8 +185,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
-
-    """
     ###### CLearning rate decay ######
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
@@ -201,7 +199,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     ###### Optimizer ######
     learning_rate = tf.placeholder(tf.float32, shape=[])
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-
+    """
     ###### Predictions for the current training minibatch ######
     train_prediction = tf.nn.softmax(logits)
 
@@ -226,7 +224,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)
-                """
                 # Reinitialize learning rate
                 tf.variables_initializer([batch,]).run()
                 learning_rate = tf.train.exponential_decay(
@@ -235,7 +232,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                 5*train_size,                       # Decay step.
                                 0.99,                               # Decay rate.
                                 staircase=True)
-                """
             # Training
             # initialize performance indicators
             loss_history = []
@@ -247,19 +243,27 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
             for epoch in range(num_epochs):
                 start_time = time.time()
                 train_loss, train_acc = 0.0, 0.0
+                """
                 # init learning rate
                 lr = model_archi["init_learning_rate"]
+                """
                 print("")
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 Batches = get_batches(train_data, train_labels, BATCH_SIZE)
                 for batch_ in Batches:
                     feed_dict={train_data_node: batch_[0],
+                            train_labels_node: batch_[1]}
+                    """
+                    feed_dict={train_data_node: batch_[0],
                             train_labels_node: batch_[1],
                             learning_rate: lr}
+                    """
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
+                    """
                     l, predictions = sess.run([loss, train_prediction], feed_dict=feed_dict)
-                    #l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
+                    """
+                    l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
                     train_acc += accuracy(predictions,batch_[1]) / len(Batches)
@@ -268,14 +272,14 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 if train_loss<best_train_loss:
                     best_train_loss = train_loss
                 # Print info for previous epoch
-                #print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
-                #logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-4".format(epoch,time.time()-start_time,lr*10000))
                 print("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
                 logging.info("Epoch {} done, took {:.2f}s, learning rate: {:.2f}e-3".format(epoch,time.time()-start_time,lr*1000))
                 print("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
                 print("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
                 logging.info("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
                 logging.info("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
+
+                """
                 # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
                 eps = float(best_train_loss)/50
                 fct = 2
@@ -286,6 +290,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     loss_history.pop(0)
                 if best_train_loss - eps < min(loss_history):
                     lr = float(lr)/fct
+                """
+
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
                     eval_loss_, eval_acc = 0.0, 0.0

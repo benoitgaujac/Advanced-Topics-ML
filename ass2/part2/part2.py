@@ -24,15 +24,15 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 256
-BATCH_SIZE_EVAL = 256
+BATCH_SIZE = 512
+BATCH_SIZE_EVAL = 512
 nsample = 100
 nsamples = 11
 
 num_epochs = 100
 epochs_per_checkpoint =3
 
-from_pretrained_weights = True
+from_pretrained_weights = False
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -43,15 +43,15 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
 
 ######################################## Models architectures ########################################
 gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.01}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.001}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.005}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.005}
 gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.01}
 
-#models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-#        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-
 models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-        "gru1l128u": gru1l128u}
+        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
+
+#models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+#        "gru1l128u": gru1l128u}
 
 ######################################## Data processing ########################################
 def data_type():
@@ -187,17 +187,28 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
         eval_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
                                                 targets=eval_data_node[:,1:],
                                                 logits=eval_logits))
-
+    ###### Create varaible for batch ######
+    batch = tf.Variable(0, dtype=data_type())
+    ###### CLearning rate decay ######
+    learning_rate = tf.train.exponential_decay(
+                    model_archi["init_learning_rate"],  # Base learning rate.
+                    batch * BATCH_SIZE,                 # Current index into the dataset.
+                    5*train_size,                       # Decay step.
+                    0.99,                               # Decay rate.
+                    staircase=True)
+    ###### Optimizer ######
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
+    """
     ###### Optimizer ######
     learning_rate = tf.placeholder(tf.float32, shape=[])
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
+    """
     ###### Predictions for the current training minibatch ######
     train_prediction = tf.sigmoid(logits)
     ###### Predictions for the validation ######
     eval_prediction = tf.sigmoid(eval_logits)
     ###### Saver ######
     saver = tf.train.Saver()
-
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
         # Training
@@ -211,13 +222,22 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 tf.global_variables_initializer().run()
             else:
                 saver.restore(sess, DST)
-
+                # Reinitialize learning rate
+                tf.variables_initializer([batch,]).run()
+                learning_rate = tf.train.exponential_decay(
+                                model_archi["init_learning_rate"],  # Base learning rate.
+                                batch * BATCH_SIZE,                 # Current index into the dataset.
+                                5*train_size,                       # Decay step.
+                                0.99,                               # Decay rate.
+                                staircase=True)
             # initialize performance indicators
             loss_history = [10000.0,]
             best_train_loss, best_eval_loss = 10000.0, 10000.0
             best_train_acc, best_eval_acc = 0.0, 0.0
+            """
             # init learning rate
             lr = model_archi["init_learning_rate"]
+            """
             #training loop
             print("\nStart training {}...".format(nn_model))
             logging.info("Start training {}...".format(nn_model))
@@ -229,10 +249,16 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 Batches = get_batches(train_data, BATCH_SIZE)
                 for batch_ in Batches:
+                    feed_dict = {train_data_node: batch_}
+                    """
                     feed_dict = {train_data_node: batch_, learning_rate: lr}
+                    """
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
+                    """
                     l, predictions = sess.run([loss, train_prediction], feed_dict=feed_dict)
+                    """
+                    l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
                     train_acc += accuracy_logistic(predictions,batch_[:,1:]) / len(Batches)
@@ -247,6 +273,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                                             train_loss,best_train_loss,best_train_acc*100))
                 logging.info("Epoch loss: {:.4f}, Best train loss: {:.4f}, Best train accuracy: {:.2f}%".format(
                                                             train_loss,best_train_loss,best_train_acc*100))
+
+                """
                 # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
                 eps = float(best_train_loss)/50
                 fct = 2
@@ -257,6 +285,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     loss_history.pop(0)
                 if loss_history[0]==min(loss_history) and best_train_loss - eps < min(loss_history):
                     lr = float(lr)/fct
+                """
 
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
