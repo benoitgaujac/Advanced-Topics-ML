@@ -190,7 +190,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
                     5*train_size,                       # Decay step.
-                    0.99,                               # Decay rate.
+                    0.85,                               # Decay rate.
                     staircase=True)
 
     ###### Optimizer ######
@@ -230,7 +230,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                 model_archi["init_learning_rate"],  # Base learning rate.
                                 batch * BATCH_SIZE,                 # Current index into the dataset.
                                 5*train_size,                       # Decay step.
-                                0.99,                               # Decay rate.
+                                0.85,                               # Decay rate.
                                 staircase=True)
             # Training
             # initialize performance indicators

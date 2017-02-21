@@ -194,7 +194,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
                     5*train_size,                       # Decay step.
-                    0.99,                               # Decay rate.
+                    0.85,                               # Decay rate.
                     staircase=True)
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
@@ -228,7 +228,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                 model_archi["init_learning_rate"],  # Base learning rate.
                                 batch * BATCH_SIZE,                 # Current index into the dataset.
                                 5*train_size,                       # Decay step.
-                                0.99,                               # Decay rate.
+                                0.85,                               # Decay rate.
                                 staircase=True)
             # initialize performance indicators
             loss_history = [10000.0,]
