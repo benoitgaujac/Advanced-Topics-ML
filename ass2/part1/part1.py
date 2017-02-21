@@ -14,8 +14,6 @@ import build_model
 
 import logging
 
-
-
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
@@ -25,12 +23,12 @@ NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 256
-BATCH_SIZE_EVAL = 256
+BATCH_SIZE_EVAL = 2048
 
-num_epochs = 75
+num_epochs = 10
 epochs_per_checkpoint = 3
 
-from_pretrained_weights = False
+from_pretrained_weights = True
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -40,20 +38,21 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.01}
-lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.005}
-lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.005}
-lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.01}
-gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.01}
-gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.005}
-gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.005}
-gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.01}
-#models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
-#        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-#        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-models = {"lstm1l64u":lstm1l64u, "lstm3l32u":lstm3l32u,
-        "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-        "gru3l32u": gru3l32u}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.005}
+lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0005}
+lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.001}
+lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.005}
+gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.005}
+gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.001}
+gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
+gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.005}
+models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
+        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
+#models = {"lstm1l32u":lstm1l32u, "gru1l32u":gru1l32u,}
+        #"lstm3l32u":lstm3l32u,
+        #"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+        #"gru3l32u": gru3l32u}
 
 
 ######################################## Data processing ########################################
@@ -147,41 +146,55 @@ def get_batches(images, labels, batch_size=BATCH_SIZE):
 
 ######################################## Main ########################################
 def main(model_archi,train_data, train_labels, validation_data, validation_labels, test_data, test_labels, mode_):
-
-
     nn_model = model_archi["name"]
     # Create weights dst DIR
     DST = create_DST_DIT(nn_model)
-    print(DST)
 
     train_size = train_labels.shape[0]
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
-    train_data_node = tf.placeholder(data_type(),shape=(BATCH_SIZE, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    train_labels_node = tf.placeholder(tf.int64, shape=(BATCH_SIZE,))
-    eval_data_node = tf.placeholder(data_type(),shape=(BATCH_SIZE_EVAL, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    eval_labels_node = tf.placeholder(tf.int64, shape=(BATCH_SIZE_EVAL,))
+    data_node = tf.placeholder(data_type(),shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+    labels_node = tf.placeholder(tf.int64, shape=(None,))
+    """
+    train_data_node = tf.placeholder(data_type(),shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+    train_labels_node = tf.placeholder(tf.int64, shape=(None,))
+    eval_data_node = tf.placeholder(data_type(),shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+    eval_labels_node = tf.placeholder(tf.int64, shape=(None,))
+    """
 
     ###### Build model and loss ######
-    with tf.variable_scope(nn_model) as scope:
-        # Training
-        logits = build_model.model(train_data_node, name=nn_model,
+    #with tf.variable_scope(nn_model) as scope:
+    phase_train = tf.placeholder(tf.bool, name='phase_train')
+    # Training
+    """
+    logits = build_model.model(train_data_node, name=nn_model,
+                                                cell=model_archi["cell"],
+                                                nlayers=model_archi["layers"],
+                                                nunits=model_archi["units"],
+                                                training=phase_train)
+    loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
+                                labels=train_labels_node, logits=logits))
+    """
+    logits = build_model.model(data_node, name=nn_model,
+                                                cell=model_archi["cell"],
+                                                nlayers=model_archi["layers"],
+                                                nunits=model_archi["units"],
+                                                training=phase_train)
+    loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
+                                labels=labels_node, logits=logits))
+
+
+    """
+    scope.reuse_variables()
+    # Validation and testing
+    eval_logits = build_model.model(eval_data_node, name=nn_model,
                                                     cell=model_archi["cell"],
                                                     nlayers=model_archi["layers"],
                                                     nunits=model_archi["units"],
-                                                    training=True)
-        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                                    labels=train_labels_node, logits=logits))
-
-        scope.reuse_variables()
-        # Validation and testing
-        eval_logits = build_model.model(eval_data_node, name=nn_model,
-                                                        cell=model_archi["cell"],
-                                                        nlayers=model_archi["layers"],
-                                                        nunits=model_archi["units"],
-                                                        training=False)
-        eval_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                                    labels=eval_labels_node, logits=eval_logits))
+                                                    training=phase_train)
+    eval_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
+                                labels=eval_labels_node, logits=eval_logits))
+    """
 
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
@@ -201,10 +214,12 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
     """
     ###### Predictions for the current training minibatch ######
-    train_prediction = tf.nn.softmax(logits)
+    prediction = tf.nn.softmax(logits)
 
+    """
     ###### Predictions for the validation ######
     eval_prediction = tf.nn.softmax(eval_logits)
+    """
 
     ###### Saver ######
     #saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
@@ -221,7 +236,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
             # Load pre trained models
             if not tf.gfile.Exists(DST+ ".meta") or not from_pretrained_weights:
-                tf.global_variables_initializer().run()
+                sess.run(tf.global_variables_initializer(), feed_dict={phase_train: True})
             else:
                 saver.restore(sess, DST)
                 # Reinitialize learning rate
@@ -251,8 +266,9 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 Batches = get_batches(train_data, train_labels, BATCH_SIZE)
                 for batch_ in Batches:
-                    feed_dict={train_data_node: batch_[0],
-                            train_labels_node: batch_[1]}
+                    feed_dict={data_node: batch_[0],
+                                labels_node: batch_[1],
+                                phase_train: True}
                     """
                     feed_dict={train_data_node: batch_[0],
                             train_labels_node: batch_[1],
@@ -263,7 +279,7 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     """
                     l, predictions = sess.run([loss, train_prediction], feed_dict=feed_dict)
                     """
-                    l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
+                    l, lr, predictions = sess.run([loss, learning_rate, prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
                     train_acc += accuracy(predictions,batch_[1]) / len(Batches)
@@ -297,9 +313,16 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     eval_loss_, eval_acc = 0.0, 0.0
                     eval_Batches = get_batches(validation_data, validation_labels, BATCH_SIZE_EVAL)
                     for eval_batch in eval_Batches:
+                        """
                         ev_loss, ev_pred = sess.run([eval_loss, eval_prediction], feed_dict={
                                                                 eval_data_node: eval_batch[0],
-                                                                eval_labels_node: eval_batch[1]})
+                                                                eval_labels_node: eval_batch[1],
+                                                                phase_train: False})
+                        """
+                        ev_loss, ev_pred = sess.run([loss, prediction], feed_dict={
+                                                                data_node: eval_batch[0],
+                                                                labels_node: eval_batch[1],
+                                                                phase_train: False})
                         eval_loss_ += ev_loss / len(eval_Batches)
                         eval_acc += accuracy(ev_pred,eval_batch[1]) / len(eval_Batches)
                     if eval_acc>best_eval_acc:
@@ -314,34 +337,34 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     sys.stdout.flush()
                 # Writing csv file with results and saving models
                 Trainwriter.writerow([epoch + 1, time.time() - start_time,
-                                    train_loss, train_acc, eval_loss_, eval_acc])
+                                                    train_loss, train_acc,
+                                                    eval_loss_, eval_acc])
 
         # Testing
         csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
         Testwriter = csv.writer(csvfileTest, delimiter=';',)
         Testwriter.writerow(['Test loss', 'Test accuracy'])
-        """
-        if not tf.gfile.Exists(DST):
+        if not tf.gfile.Exists(DST+ ".meta"):
             raise Exception("no weights given")
         saver.restore(sess, DST)
-        """
         vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
         name_vars = [v.name for v in vars_]
         # Compute and print results once training is done
         test_loss, test_acc = 0.0, 0.0
         test_Batches = get_batches(test_data, test_labels, BATCH_SIZE_EVAL)
         for test_batch in test_Batches:
-            tst_loss, tst_pred = sess.run([eval_loss, eval_prediction], feed_dict={
-                                                        eval_data_node: test_batch[0],
-                                                        eval_labels_node: test_batch[1]})
+            tst_loss, tst_pred = sess.run([loss, prediction], feed_dict={
+                                                    data_node: test_batch[0],
+                                                    labels_node: test_batch[1],
+                                                    phase_train: False})
             test_loss += tst_loss / len(test_Batches)
             test_acc += accuracy(tst_pred,test_batch[1]) / len(test_Batches)
         print("\nTesting after {} epochs.".format(num_epochs))
         print("Test loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         logging.info("\nTest loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         Testwriter.writerow([test_loss,test_acc])
-        #tf.reset_default_graph()
         sess.close()
+        #tf.reset_default_graph()
 
 if __name__ == '__main__':
     logging.basicConfig(filename='out.log', level=logging.DEBUG)
@@ -359,16 +382,19 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    #train_data = train_data[:1000]
-    #train_labels = train_labels[:1000]
+    train_data = train_data[:2000]
+    train_labels = train_labels[:2000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
     if options.model not in models.keys():
+        raise Exception("Invalide model name")
+        """
         if options.mode=="train":
             for model_ in models.keys():
                 main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
         else:
             raise Exception("You have to give one unique existing model to test")
+        """
     else:
         main(models[options.model],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
