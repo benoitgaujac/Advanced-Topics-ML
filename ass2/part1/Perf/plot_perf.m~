@@ -54,12 +54,16 @@ colConv1 = [0 0 0.8];
 colconv = [0.2 0.4 1.0];
 
 f5 = figure
-plot(epochs,perfs_1L{:,4},':',epochs,perfs_1L{:,6},'color',col1l,'LineWidth',.8) 
+plot(epochs,perfs_1L{:,4},'--',epochs,perfs_1L{:,6},'color',col1l) 
 title('Accuracy models')
 xlabel('epochs') % x-axis label
 ylabel('accuracy') % y-axis label
-ylim([0.7 0.995])
+legend('training accuracy', 'validation accuracy', 'Location','southeast')
 hold on;
-plot(epochs(1:80),perfs_2H{:,4},':',epochs(1:80),perfs_2H{:,6},'color',col2h,'LineWidth',.8) 
-plot(epochs,perfs_1H{:,4},':',epochs,perfs_1H{:,6},'color',col1h,'LineWidth',.8) 
+plot(epochs,perfs_2H{:,4},'--',epochs,perfs_2H{1:150,6},'color',col2h) 
+legend('training accuracy', 'validation accuracy', 'Location','southeast')
+plot(epochs,perfs_1H{1:150,4},'--',epochs,perfs_1H{1:150,6},'color',col1h) 
+legend('training accuracy', 'validation accuracy', 'Location','southeast')
+plot(epochs,perfs_1L{1:150,4},'--',epochs,perfs_1L{1:150,6},'color',col1l) 
+legend('training accuracy', 'validation accuracy', 'Location','southeast')
 hold off;
