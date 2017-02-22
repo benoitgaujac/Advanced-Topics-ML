@@ -22,8 +22,8 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 256
-BATCH_SIZE_EVAL = 2048
+BATCH_SIZE = 512
+BATCH_SIZE_EVAL = 512
 
 num_epochs = 100
 epochs_per_checkpoint = 2
@@ -46,9 +46,10 @@ gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_le
 gru1l64u = {"name": "gru1l64u", "cell": "GRU", "layers": 1, "units":64, "init_learning_rate": 0.001}
 gru1l128u = {"name": "gru1l128u", "cell": "GRU", "layers": 1, "units":128, "init_learning_rate": 0.001}
 gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_learning_rate": 0.005}
-models = {"lstm1l32u": lstm1l32u,"lstm1l64u":lstm1l64u, "lstm1l128u": lstm1l128u,
-        "lstm3l32u":lstm3l32u, "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-        "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
+models = {  "lstm1l32u": lstm1l32u, "lstm1l64u":lstm1l64u,
+            "lstm1l128u": lstm1l128u, "lstm3l32u":lstm3l32u,
+            "gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
+            "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
 #models = {"lstm1l32u":lstm1l32u, "gru1l32u":gru1l32u,}
         #"lstm3l32u":lstm3l32u,
         #"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
