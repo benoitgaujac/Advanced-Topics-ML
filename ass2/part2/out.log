@@ -1695,3 +1695,90 @@ INFO:root:2017-02-21 09:41:18
 INFO:root:Epoch 14 done, took 11.77s, learning rate: 9.70e-3
 INFO:root:Epoch loss: 0.3464, Best train loss: 0.3464, Best train accuracy: 87.88%
 INFO:root:2017-02-21 09:41:30
+INFO:root:
+Test loss: 0.0979, Test acc: 95.98%
+INFO:root:Start training gru1l32u...
+INFO:root:2017-02-21 19:01:42
+INFO:root:Start training gru1l32u...
+INFO:root:2017-02-21 19:02:50
+INFO:root:Start training gru1l32u...
+INFO:root:2017-02-21 19:03:13
+INFO:root:Epoch 0 done, took 22.40s, learning rate: 10.00e-3
+INFO:root:Epoch loss: 0.6338, Best train loss: 0.6338, Best train accuracy: 69.55%
+INFO:root:Validation loss: 0.5373, Best validation loss: 0.5373, Best validation accuracy: 90.85%
+INFO:root:Start training gru1l32u...
+INFO:root:2017-02-21 19:05:35
+INFO:root:Epoch 0 done, took 15.32s, learning rate: 10.00e-3
+INFO:root:Epoch loss: 0.3978, Best train loss: 0.3978, Best train accuracy: 92.84%
+INFO:root:Validation loss: 0.3000, Best validation loss: 0.3000, Best validation accuracy: 93.38%
+INFO:root:2017-02-21 19:06:04
+INFO:root:Epoch 1 done, took 15.05s, learning rate: 10.00e-3
+INFO:root:Epoch loss: 0.2345, Best train loss: 0.2345, Best train accuracy: 93.36%
+INFO:root:2017-02-21 19:06:19
+INFO:root:Epoch 2 done, took 15.36s, learning rate: 10.00e-3
+INFO:root:Epoch loss: 0.2007, Best train loss: 0.2007, Best train accuracy: 93.36%
+INFO:root:2017-02-21 19:06:34
+INFO:root:Epoch 3 done, took 16.21s, learning rate: 10.00e-3
+INFO:root:Epoch loss: 0.1914, Best train loss: 0.1914, Best train accuracy: 93.36%
+INFO:root:Validation loss: 0.1806, Best validation loss: 0.1806, Best validation accuracy: 93.42%
+INFO:root:2017-02-21 19:07:05
+INFO:root:Epoch 4 done, took 14.95s, learning rate: 8.50e-3
+INFO:root:Epoch loss: 0.1792, Best train loss: 0.1792, Best train accuracy: 93.36%
+INFO:root:2017-02-21 19:07:19
+INFO:root:Epoch 5 done, took 14.84s, learning rate: 8.50e-3
+INFO:root:Epoch loss: 0.1698, Best train loss: 0.1698, Best train accuracy: 93.38%
+INFO:root:2017-02-21 19:07:34
+INFO:root:Epoch 6 done, took 14.55s, learning rate: 8.50e-3
+INFO:root:Epoch loss: 0.1629, Best train loss: 0.1629, Best train accuracy: 93.41%
+INFO:root:Validation loss: 0.1547, Best validation loss: 0.1547, Best validation accuracy: 93.68%
+INFO:root:2017-02-21 19:08:02
+INFO:root:Epoch 7 done, took 14.69s, learning rate: 8.50e-3
+INFO:root:Epoch loss: 0.1588, Best train loss: 0.1588, Best train accuracy: 93.58%
+INFO:root:2017-02-21 19:08:17
+INFO:root:Epoch 8 done, took 14.60s, learning rate: 8.50e-3
+INFO:root:Epoch loss: 0.1550, Best train loss: 0.1550, Best train accuracy: 93.58%
+INFO:root:2017-02-21 19:08:31
+INFO:root:Epoch 9 done, took 14.55s, learning rate: 7.23e-3
+INFO:root:Epoch loss: 0.1515, Best train loss: 0.1515, Best train accuracy: 93.64%
+INFO:root:Validation loss: 0.1438, Best validation loss: 0.1438, Best validation accuracy: 93.90%
+INFO:root:2017-02-21 19:08:59
+INFO:root:Epoch 10 done, took 14.61s, learning rate: 7.23e-3
+INFO:root:Epoch loss: 0.1470, Best train loss: 0.1470, Best train accuracy: 93.80%
+INFO:root:2017-02-21 19:09:14
+INFO:root:Epoch 11 done, took 14.63s, learning rate: 7.23e-3
+INFO:root:Epoch loss: 0.1436, Best train loss: 0.1436, Best train accuracy: 93.91%
+INFO:root:2017-02-21 19:09:29
+INFO:root:Epoch 12 done, took 14.82s, learning rate: 7.23e-3
+INFO:root:Epoch loss: 0.1408, Best train loss: 0.1408, Best train accuracy: 93.98%
+INFO:root:Validation loss: 0.1334, Best validation loss: 0.1334, Best validation accuracy: 94.05%
+INFO:root:2017-02-21 19:09:59
+INFO:root:Epoch 13 done, took 17.62s, learning rate: 7.23e-3
+INFO:root:Epoch loss: 0.1376, Best train loss: 0.1376, Best train accuracy: 94.08%
+INFO:root:2017-02-21 19:10:16
+INFO:root:Epoch 14 done, took 18.75s, learning rate: 6.14e-3
+INFO:root:Epoch loss: 0.1347, Best train loss: 0.1347, Best train accuracy: 94.22%
+INFO:root:2017-02-21 19:10:35
+INFO:root:Epoch 15 done, took 20.49s, learning rate: 6.14e-3
+INFO:root:Epoch loss: 0.1318, Best train loss: 0.1318, Best train accuracy: 94.34%
+INFO:root:Validation loss: 0.1241, Best validation loss: 0.1241, Best validation accuracy: 94.69%
+INFO:root:2017-02-21 19:11:16
+INFO:root:Epoch 16 done, took 25.98s, learning rate: 6.14e-3
+INFO:root:Epoch loss: 0.1305, Best train loss: 0.1305, Best train accuracy: 94.40%
+INFO:root:2017-02-21 19:11:42
+INFO:root:Epoch 17 done, took 30.04s, learning rate: 6.14e-3
+INFO:root:Epoch loss: 0.1296, Best train loss: 0.1296, Best train accuracy: 94.45%
+INFO:root:2017-02-21 19:12:12
+INFO:root:Epoch 18 done, took 32.19s, learning rate: 6.14e-3
+INFO:root:Epoch loss: 0.1280, Best train loss: 0.1280, Best train accuracy: 94.55%
+INFO:root:Validation loss: 0.1207, Best validation loss: 0.1207, Best validation accuracy: 94.85%
+INFO:root:2017-02-21 19:13:08
+INFO:root:Epoch 19 done, took 30.53s, learning rate: 5.22e-3
+INFO:root:Epoch loss: 0.1262, Best train loss: 0.1262, Best train accuracy: 94.63%
+INFO:root:2017-02-21 19:13:38
+INFO:root:Epoch 20 done, took 51.77s, learning rate: 5.22e-3
+INFO:root:Epoch loss: 0.1260, Best train loss: 0.1260, Best train accuracy: 94.65%
+INFO:root:2017-02-21 19:14:30
+INFO:root:Start training gru1l32u...
+INFO:root:2017-02-21 19:14:58
+INFO:root:Epoch 0 done, took 37.49s, learning rate: 10.00e-3
+INFO:root:Epoch loss: 0.1313, Best train loss: 0.1313, Best train accuracy: 94.34%

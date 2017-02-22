@@ -69,16 +69,12 @@ def batch_norm(x, n_out, phase_train):
     normed = tf.nn.batch_normalization(x, mean, var, beta, gamma, 1e-3)
     return normed
 
-
 ######################################## Model ########################################
 def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
-        #imshape = x.get_shape().as_list()
         images_embedded = tf.reshape(x, [-1,IMAGE_SIZE * IMAGE_SIZE,1]) # shape [batch_size,IMAGE_SIZE * IMAGE_SIZE,1]
-
         # Creating base Cell
         cells = base_cell(cell, nlayers, nunits, training)
         # Build RNN network
-        #seq_lent = IMAGE_SIZE*IMAGE_SIZE * np.ones([imshape[0]])
         outputs, state = tf.nn.dynamic_rnn(cells, images_embedded, dtype=data_type()) # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
         out = outputs[:,-1,:] # We are interested only on the last output of the RNN. out shape : [batch,nunits]
         # batch normalization

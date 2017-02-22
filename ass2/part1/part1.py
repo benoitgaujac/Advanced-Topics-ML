@@ -25,10 +25,10 @@ SEED = 66478  # Set to None for random seed.
 BATCH_SIZE = 256
 BATCH_SIZE_EVAL = 2048
 
-num_epochs = 10
-epochs_per_checkpoint = 3
+num_epochs = 100
+epochs_per_checkpoint = 2
 
-from_pretrained_weights = True
+from_pretrained_weights = False
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -39,7 +39,7 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
 
 ######################################## Models architectures ########################################
 lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.005}
-lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.0005}
+lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.001}
 lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.001}
 lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.005}
 gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.005}
@@ -155,26 +155,10 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     ###### Create tf placeholder ######
     data_node = tf.placeholder(data_type(),shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
     labels_node = tf.placeholder(tf.int64, shape=(None,))
-    """
-    train_data_node = tf.placeholder(data_type(),shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    train_labels_node = tf.placeholder(tf.int64, shape=(None,))
-    eval_data_node = tf.placeholder(data_type(),shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    eval_labels_node = tf.placeholder(tf.int64, shape=(None,))
-    """
-
     ###### Build model and loss ######
     #with tf.variable_scope(nn_model) as scope:
     phase_train = tf.placeholder(tf.bool, name='phase_train')
     # Training
-    """
-    logits = build_model.model(train_data_node, name=nn_model,
-                                                cell=model_archi["cell"],
-                                                nlayers=model_archi["layers"],
-                                                nunits=model_archi["units"],
-                                                training=phase_train)
-    loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                                labels=train_labels_node, logits=logits))
-    """
     logits = build_model.model(data_node, name=nn_model,
                                                 cell=model_archi["cell"],
                                                 nlayers=model_archi["layers"],
@@ -182,20 +166,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                                                 training=phase_train)
     loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
                                 labels=labels_node, logits=logits))
-
-
-    """
-    scope.reuse_variables()
-    # Validation and testing
-    eval_logits = build_model.model(eval_data_node, name=nn_model,
-                                                    cell=model_archi["cell"],
-                                                    nlayers=model_archi["layers"],
-                                                    nunits=model_archi["units"],
-                                                    training=phase_train)
-    eval_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                                labels=eval_labels_node, logits=eval_logits))
-    """
-
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
     ###### CLearning rate decay ######
@@ -208,23 +178,11 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
 
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-    """
-    ###### Optimizer ######
-    learning_rate = tf.placeholder(tf.float32, shape=[])
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-    """
     ###### Predictions for the current training minibatch ######
     prediction = tf.nn.softmax(logits)
-
-    """
-    ###### Predictions for the validation ######
-    eval_prediction = tf.nn.softmax(eval_logits)
-    """
-
     ###### Saver ######
     #saver = tf.train.Saver(write_version=tf.train.SaverDef.V1)
     saver = tf.train.Saver()
-
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
         # Training
@@ -233,7 +191,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
             csvfileTrain = open('Perf/Training_' + str(nn_model) + '.csv', 'w')
             Trainwriter = csv.writer(csvfileTrain, delimiter=';',)
             Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Training accuracy', 'Validation loss','Validation accuracy'])
-
             # Load pre trained models
             if not tf.gfile.Exists(DST+ ".meta") or not from_pretrained_weights:
                 sess.run(tf.global_variables_initializer(), feed_dict={phase_train: True})
@@ -258,10 +215,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
             for epoch in range(num_epochs):
                 start_time = time.time()
                 train_loss, train_acc = 0.0, 0.0
-                """
-                # init learning rate
-                lr = model_archi["init_learning_rate"]
-                """
                 print("")
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 Batches = get_batches(train_data, train_labels, BATCH_SIZE)
@@ -269,16 +222,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                     feed_dict={data_node: batch_[0],
                                 labels_node: batch_[1],
                                 phase_train: True}
-                    """
-                    feed_dict={train_data_node: batch_[0],
-                            train_labels_node: batch_[1],
-                            learning_rate: lr}
-                    """
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
-                    """
-                    l, predictions = sess.run([loss, train_prediction], feed_dict=feed_dict)
-                    """
                     l, lr, predictions = sess.run([loss, learning_rate, prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
@@ -294,31 +239,11 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 print("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
                 logging.info("loss: {:.4f}, Best train loss: {:.4f}".format(train_loss,best_train_loss))
                 logging.info("acc: {:.3f}%, Best train acc: {:.3f}%".format(train_acc*100,best_train_acc*100))
-
-                """
-                # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
-                eps = float(best_train_loss)/50
-                fct = 2
-                if epoch>49:
-                    fct=10
-                loss_history.append(train_loss)
-                if len(loss_history)>5:
-                    loss_history.pop(0)
-                if best_train_loss - eps < min(loss_history):
-                    lr = float(lr)/fct
-                """
-
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
                     eval_loss_, eval_acc = 0.0, 0.0
                     eval_Batches = get_batches(validation_data, validation_labels, BATCH_SIZE_EVAL)
                     for eval_batch in eval_Batches:
-                        """
-                        ev_loss, ev_pred = sess.run([eval_loss, eval_prediction], feed_dict={
-                                                                eval_data_node: eval_batch[0],
-                                                                eval_labels_node: eval_batch[1],
-                                                                phase_train: False})
-                        """
                         ev_loss, ev_pred = sess.run([loss, prediction], feed_dict={
                                                                 data_node: eval_batch[0],
                                                                 labels_node: eval_batch[1],
@@ -364,7 +289,6 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
         logging.info("\nTest loss: {:.4f}, Test acc: {:.2f}%".format(test_loss,test_acc*100))
         Testwriter.writerow([test_loss,test_acc])
         sess.close()
-        #tf.reset_default_graph()
 
 if __name__ == '__main__':
     logging.basicConfig(filename='out.log', level=logging.DEBUG)
@@ -382,19 +306,12 @@ if __name__ == '__main__':
     # shuffl data
     train_data, train_labels = shuffle(train_data, train_labels, random_state=SEED)
 
-    train_data = train_data[:2000]
-    train_labels = train_labels[:2000]
+    train_data = train_data[:5000]
+    train_labels = train_labels[:5000]
 
     options, arguments = parser.parse_args(sys.argv)
     # run for model
     if options.model not in models.keys():
         raise Exception("Invalide model name")
-        """
-        if options.mode=="train":
-            for model_ in models.keys():
-                main(models[model_],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)
-        else:
-            raise Exception("You have to give one unique existing model to test")
-        """
     else:
         main(models[options.model],train_data, train_labels, validation_data, validation_labels, test_data, test_labels,options.mode)

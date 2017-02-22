@@ -24,8 +24,8 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 512
-BATCH_SIZE_EVAL = 512
+BATCH_SIZE = 128
+BATCH_SIZE_EVAL = 128
 nsample = 100
 nsamples = 11
 
@@ -161,32 +161,18 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     train_size = train_data.shape[0]
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
-    train_data_node = tf.placeholder(dtype=data_type(),
-                                    shape=(BATCH_SIZE, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-    eval_data_node = tf.placeholder(dtype = data_type(),
-                                    shape=(BATCH_SIZE_EVAL, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
+    data_node = tf.placeholder(dtype=data_type(), shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
 
     ###### Build model and loss ######
-    with tf.variable_scope(nn_model) as scope:
-        # Training
-        logits = build_model.model(train_data_node, name=nn_model,
-                                                    cell=model_archi["cell"],
-                                                    nlayers=model_archi["layers"],
-                                                    nunits=model_archi["units"],
-                                                    training=True)
-        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-                                                targets=train_data_node[:,1:],
-                                                logits=logits))
-        scope.reuse_variables()
-        # Validation and testing
-        eval_logits = build_model.model(eval_data_node, name=nn_model,
-                                                        cell=model_archi["cell"],
-                                                        nlayers=model_archi["layers"],
-                                                        nunits=model_archi["units"],
-                                                        training=False)
-        eval_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
-                                                targets=eval_data_node[:,1:],
-                                                logits=eval_logits))
+    phase_train = tf.placeholder(tf.bool, name='phase_train')
+    logits = build_model.model(data_node,   name=nn_model,
+                                            cell=model_archi["cell"],
+                                            nlayers=model_archi["layers"],
+                                            nunits=model_archi["units"],
+                                            training=phase_train)
+    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
+                                            targets=data_node[:,1:],
+                                            logits=logits))
     ###### Create varaible for batch ######
     batch = tf.Variable(0, dtype=data_type())
     ###### CLearning rate decay ######
@@ -198,15 +184,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                     staircase=True)
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
-    """
-    ###### Optimizer ######
-    learning_rate = tf.placeholder(tf.float32, shape=[])
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss)
-    """
     ###### Predictions for the current training minibatch ######
-    train_prediction = tf.sigmoid(logits)
-    ###### Predictions for the validation ######
-    eval_prediction = tf.sigmoid(eval_logits)
+    prediction = tf.sigmoid(logits)
     ###### Saver ######
     saver = tf.train.Saver()
     ###### Create a local session to run the training ######
@@ -219,7 +198,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             Trainwriter.writerow(['Num Epoch', 'Time', 'Training loss', 'Validation loss'])
             # Load pre trained model if exist
             if not tf.gfile.Exists(DST + ".meta") or not from_pretrained_weights:
-                tf.global_variables_initializer().run()
+                sess.run(tf.global_variables_initializer(), feed_dict={phase_train: True})
             else:
                 saver.restore(sess, DST)
                 # Reinitialize learning rate
@@ -234,10 +213,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
             loss_history = [10000.0,]
             best_train_loss, best_eval_loss = 10000.0, 10000.0
             best_train_acc, best_eval_acc = 0.0, 0.0
-            """
-            # init learning rate
-            lr = model_archi["init_learning_rate"]
-            """
             #training loop
             print("\nStart training {}...".format(nn_model))
             logging.info("Start training {}...".format(nn_model))
@@ -249,16 +224,10 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                 logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 Batches = get_batches(train_data, BATCH_SIZE)
                 for batch_ in Batches:
-                    feed_dict = {train_data_node: batch_}
-                    """
-                    feed_dict = {train_data_node: batch_, learning_rate: lr}
-                    """
+                    feed_dict = {data_node: batch_, phase_train: True}
                     # Run the optimizer to update weights.
                     sess.run(optimizer, feed_dict=feed_dict)
-                    """
-                    l, predictions = sess.run([loss, train_prediction], feed_dict=feed_dict)
-                    """
-                    l, lr, predictions = sess.run([loss, learning_rate, train_prediction], feed_dict=feed_dict)
+                    l, lr, predictions = sess.run([loss, learning_rate, prediction], feed_dict=feed_dict)
                     # Update average loss and accuracy
                     train_loss += l / len(Batches)
                     train_acc += accuracy_logistic(predictions,batch_[:,1:]) / len(Batches)
@@ -273,27 +242,14 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                                             train_loss,best_train_loss,best_train_acc*100))
                 logging.info("Epoch loss: {:.4f}, Best train loss: {:.4f}, Best train accuracy: {:.2f}%".format(
                                                             train_loss,best_train_loss,best_train_acc*100))
-
-                """
-                # update learning: learning_rate<-learning_rate/2 if no improvement over last 3 epochs
-                eps = float(best_train_loss)/50
-                fct = 2
-                if epoch>30:
-                    fct=10
-                loss_history.append(train_loss)
-                if len(loss_history)>2:
-                    loss_history.pop(0)
-                if loss_history[0]==min(loss_history) and best_train_loss - eps < min(loss_history):
-                    lr = float(lr)/fct
-                """
-
                 # Perform evaluation
                 if epoch % epochs_per_checkpoint==0:
                     eval_loss_, eval_acc = 0.0, 0.0
                     eval_Batches = get_batches(validation_data, BATCH_SIZE_EVAL)
                     for eval_batch in eval_Batches:
-                        ev_loss, ev_pred = sess.run([eval_loss, eval_prediction],
-                                        feed_dict={eval_data_node: eval_batch})
+                        ev_loss, ev_pred = sess.run([loss, prediction], feed_dict={
+                                                                data_node: eval_batch,
+                                                                phase_train: False})
                         eval_loss_ += ev_loss / len(eval_Batches)
                         eval_acc += accuracy_logistic(ev_pred,eval_batch[:,1:]) / len(eval_Batches)
                     if eval_acc>best_eval_acc:
@@ -307,22 +263,21 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                                                                     eval_loss_,best_eval_loss,best_eval_acc*100))
                     sys.stdout.flush()
                 # Writing csv file with results and saving models
-                Trainwriter.writerow([epoch + 1, time.time() - start_time, train_loss, eval_loss])
+                Trainwriter.writerow([epoch + 1, time.time() - start_time, train_loss, eval_loss_])
         # Testing
         csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
         Testwriter = csv.writer(csvfileTest, delimiter=';',)
         Testwriter.writerow(['Test loss'])
-        """
-        if not tf.gfile.Exists(DST):
+        if not tf.gfile.Exists(DST+ ".meta"):
             raise Exception("no weights given")
-        """
         saver.restore(sess, DST)
         # Compute and print results once training is done
         test_loss, test_acc = 0.0, 0.0
         test_Batches = get_batches(test_data, BATCH_SIZE_EVAL)
         for test_batch in test_Batches:
-            tst_loss, tst_pred = sess.run([eval_loss, eval_prediction],
-                                    feed_dict={eval_data_node: test_batch})
+            tst_loss, tst_pred = sess.run([loss, prediction], feed_dict={
+                                                    data_node: test_batch,
+                                                    phase_train: False})
             test_loss += tst_loss / len(test_Batches)
             test_acc += accuracy_logistic(tst_pred,test_batch[:,1:]) / len(test_Batches)
         print("\nTesting after {} epochs.".format(num_epochs))
@@ -345,29 +300,15 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:10000]
+    train_data = train_data[:1000]
 
     options, arguments = parser.parse_args(sys.argv)
-    if options.mode!="inpainting":
-        # Training or testing
-        if options.model not in models:
-            if options.mode=="train":
-                for model_ in models.keys():
-                    main(models[model_],train_data, validation_data, test_data, options.mode)
-            else:
-                raise Exception("You have to give one unique existing model to test")
-        else:
-            main(models[options.model],train_data, validation_data, test_data, options.mode)
-    elif options.mode=="inpainting":
-        # pixel in-painting
-        cache_data, idx = get_cache_data_set(test_data,nsample=nsample)
-        if options.model not in models:
-            raise Exception("You have to give one unique existing model for inpainting")
-            """
-            for model_ in models.keys():
-                inpainting.in_painting(models[model_],test_data[idx],cache_data)
-            """
-        else:
-            inpainting.in_painting(models[options.model],test_data[idx],cache_data)
+    if options.model not in models.keys():
+        raise Exception("Invalide model name")
     else:
-        raise Exception("mode must be train, test or inpainting")
+        if options.mode!="inpainting":
+            main(models[options.model],train_data, validation_data, test_data, options.mode)
+        else:
+            # pixel in-painting
+            cache_data, idx = get_cache_data_set(test_data,nsample=nsample)
+            inpainting.in_painting(models[options.model],test_data[idx],cache_data)
