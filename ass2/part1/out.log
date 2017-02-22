@@ -427,3 +427,421 @@ INFO:root:Val acc: 97.40%, Best val acc: 97.40%
 INFO:root:Epoch 39 done, took 489.41s, learning rate: 1.36e-3
 INFO:root:loss: 0.0964, Best train loss: 0.0964
 INFO:root:acc: 97.158%, Best train acc: 97.158%
+INFO:root:Start training...
+INFO:root:Epoch 0 done, took 18.07s, learning rate: 1.00e-3
+INFO:root:loss: 2.3051, Best train loss: 2.3051
+INFO:root:acc: 9.570%, Best train acc: 9.570%
+INFO:root:Val loss: 2.2963, Best val loss: 2.2963
+INFO:root:Val acc: 14.26%, Best val acc: 14.26%
+INFO:root:Epoch 1 done, took 9.83s, learning rate: 1.00e-3
+INFO:root:loss: 2.2848, Best train loss: 2.2848
+INFO:root:acc: 16.191%, Best train acc: 16.191%
+INFO:root:Epoch 2 done, took 9.75s, learning rate: 1.00e-3
+INFO:root:loss: 2.2954, Best train loss: 2.2848
+INFO:root:acc: 13.223%, Best train acc: 16.191%
+INFO:root:Val loss: 2.3025, Best val loss: 2.2963
+INFO:root:Val acc: 11.37%, Best val acc: 14.26%
+INFO:root:Start training...
+INFO:root:Start training...
+INFO:root:Epoch 0 done, took 106.19s, learning rate: 1.00e-3
+INFO:root:loss: 1.8851, Best train loss: 1.8851
+INFO:root:acc: 28.857%, Best train acc: 28.857%
+INFO:root:Val loss: 1.4468, Best val loss: 1.4468
+INFO:root:Val acc: 44.18%, Best val acc: 44.18%
+INFO:root:Epoch 1 done, took 106.12s, learning rate: 1.00e-3
+INFO:root:loss: 1.4338, Best train loss: 1.4338
+INFO:root:acc: 43.359%, Best train acc: 43.359%
+INFO:root:Epoch 2 done, took 106.10s, learning rate: 1.00e-3
+INFO:root:loss: 1.3798, Best train loss: 1.3798
+INFO:root:acc: 46.213%, Best train acc: 46.213%
+INFO:root:Val loss: 1.3246, Best val loss: 1.3246
+INFO:root:Val acc: 48.69%, Best val acc: 48.69%
+INFO:root:Epoch 3 done, took 106.14s, learning rate: 1.00e-3
+INFO:root:loss: 1.3309, Best train loss: 1.3309
+INFO:root:acc: 49.584%, Best train acc: 49.584%
+INFO:root:Epoch 4 done, took 106.00s, learning rate: 0.85e-3
+INFO:root:loss: 1.2801, Best train loss: 1.2801
+INFO:root:acc: 52.436%, Best train acc: 52.436%
+INFO:root:Val loss: 1.2717, Best val loss: 1.2717
+INFO:root:Val acc: 52.19%, Best val acc: 52.19%
+INFO:root:Epoch 5 done, took 106.06s, learning rate: 0.85e-3
+INFO:root:loss: 1.1756, Best train loss: 1.1756
+INFO:root:acc: 56.008%, Best train acc: 56.008%
+INFO:root:Epoch 6 done, took 106.41s, learning rate: 0.85e-3
+INFO:root:loss: 1.0627, Best train loss: 1.0627
+INFO:root:acc: 60.977%, Best train acc: 60.977%
+INFO:root:Val loss: 1.0390, Best val loss: 1.0390
+INFO:root:Val acc: 62.48%, Best val acc: 62.48%
+INFO:root:Epoch 7 done, took 106.19s, learning rate: 0.85e-3
+INFO:root:loss: 0.8491, Best train loss: 0.8491
+INFO:root:acc: 69.529%, Best train acc: 69.529%
+INFO:root:Epoch 8 done, took 106.26s, learning rate: 0.85e-3
+INFO:root:loss: 0.6975, Best train loss: 0.6975
+INFO:root:acc: 75.760%, Best train acc: 75.760%
+INFO:root:Val loss: 0.6124, Best val loss: 0.6124
+INFO:root:Val acc: 78.81%, Best val acc: 78.81%
+INFO:root:Epoch 9 done, took 106.24s, learning rate: 0.72e-3
+INFO:root:loss: 0.5570, Best train loss: 0.5570
+INFO:root:acc: 80.633%, Best train acc: 80.633%
+INFO:root:Epoch 10 done, took 106.24s, learning rate: 0.72e-3
+INFO:root:loss: 0.4543, Best train loss: 0.4543
+INFO:root:acc: 84.227%, Best train acc: 84.227%
+INFO:root:Val loss: 0.3936, Best val loss: 0.3936
+INFO:root:Val acc: 86.99%, Best val acc: 86.99%
+INFO:root:Epoch 11 done, took 106.29s, learning rate: 0.72e-3
+INFO:root:loss: 0.3920, Best train loss: 0.3920
+INFO:root:acc: 87.059%, Best train acc: 87.059%
+INFO:root:Epoch 12 done, took 106.24s, learning rate: 0.72e-3
+INFO:root:loss: 0.3496, Best train loss: 0.3496
+INFO:root:acc: 88.674%, Best train acc: 88.674%
+INFO:root:Val loss: 0.2886, Best val loss: 0.2886
+INFO:root:Val acc: 91.43%, Best val acc: 91.43%
+INFO:root:Epoch 13 done, took 106.22s, learning rate: 0.72e-3
+INFO:root:loss: 0.2998, Best train loss: 0.2998
+INFO:root:acc: 90.768%, Best train acc: 90.768%
+INFO:root:Epoch 14 done, took 106.05s, learning rate: 0.61e-3
+INFO:root:loss: 0.2712, Best train loss: 0.2712
+INFO:root:acc: 91.679%, Best train acc: 91.679%
+INFO:root:Val loss: 0.2283, Best val loss: 0.2283
+INFO:root:Val acc: 93.18%, Best val acc: 93.18%
+INFO:root:Epoch 15 done, took 106.19s, learning rate: 0.61e-3
+INFO:root:loss: 0.2468, Best train loss: 0.2468
+INFO:root:acc: 92.576%, Best train acc: 92.576%
+INFO:root:Epoch 16 done, took 106.15s, learning rate: 0.61e-3
+INFO:root:loss: 0.2273, Best train loss: 0.2273
+INFO:root:acc: 93.106%, Best train acc: 93.106%
+INFO:root:Val loss: 0.1935, Best val loss: 0.1935
+INFO:root:Val acc: 94.36%, Best val acc: 94.36%
+INFO:root:Epoch 17 done, took 106.14s, learning rate: 0.61e-3
+INFO:root:loss: 0.2154, Best train loss: 0.2154
+INFO:root:acc: 93.605%, Best train acc: 93.605%
+INFO:root:Epoch 18 done, took 105.94s, learning rate: 0.61e-3
+INFO:root:loss: 0.2019, Best train loss: 0.2019
+INFO:root:acc: 93.906%, Best train acc: 93.906%
+INFO:root:Val loss: 0.1951, Best val loss: 0.1935
+INFO:root:Val acc: 93.67%, Best val acc: 94.36%
+INFO:root:Epoch 19 done, took 106.04s, learning rate: 0.52e-3
+INFO:root:loss: 0.1964, Best train loss: 0.1964
+INFO:root:acc: 94.103%, Best train acc: 94.103%
+INFO:root:Epoch 20 done, took 106.07s, learning rate: 0.52e-3
+INFO:root:loss: 0.1770, Best train loss: 0.1770
+INFO:root:acc: 94.774%, Best train acc: 94.774%
+INFO:root:Val loss: 0.1542, Best val loss: 0.1542
+INFO:root:Val acc: 95.31%, Best val acc: 95.31%
+INFO:root:Epoch 21 done, took 106.26s, learning rate: 0.52e-3
+INFO:root:loss: 0.1627, Best train loss: 0.1627
+INFO:root:acc: 95.182%, Best train acc: 95.182%
+INFO:root:Epoch 22 done, took 106.08s, learning rate: 0.52e-3
+INFO:root:loss: 0.1545, Best train loss: 0.1545
+INFO:root:acc: 95.445%, Best train acc: 95.445%
+INFO:root:Val loss: 0.1396, Best val loss: 0.1396
+INFO:root:Val acc: 95.78%, Best val acc: 95.78%
+INFO:root:Epoch 23 done, took 106.30s, learning rate: 0.52e-3
+INFO:root:loss: 0.1545, Best train loss: 0.1545
+INFO:root:acc: 95.435%, Best train acc: 95.445%
+INFO:root:Epoch 24 done, took 106.25s, learning rate: 0.44e-3
+INFO:root:loss: 0.1457, Best train loss: 0.1457
+INFO:root:acc: 95.716%, Best train acc: 95.716%
+INFO:root:Val loss: 0.1266, Best val loss: 0.1266
+INFO:root:Val acc: 95.98%, Best val acc: 95.98%
+INFO:root:Epoch 25 done, took 106.19s, learning rate: 0.44e-3
+INFO:root:loss: 0.1380, Best train loss: 0.1380
+INFO:root:acc: 95.945%, Best train acc: 95.945%
+INFO:root:Epoch 26 done, took 106.43s, learning rate: 0.44e-3
+INFO:root:loss: 0.1308, Best train loss: 0.1308
+INFO:root:acc: 96.166%, Best train acc: 96.166%
+INFO:root:Val loss: 0.1242, Best val loss: 0.1242
+INFO:root:Val acc: 96.11%, Best val acc: 96.11%
+INFO:root:Epoch 27 done, took 106.24s, learning rate: 0.44e-3
+INFO:root:loss: 0.1251, Best train loss: 0.1251
+INFO:root:acc: 96.351%, Best train acc: 96.351%
+INFO:root:Epoch 28 done, took 106.14s, learning rate: 0.44e-3
+INFO:root:loss: 0.1231, Best train loss: 0.1231
+INFO:root:acc: 96.463%, Best train acc: 96.463%
+INFO:root:Val loss: 0.1121, Best val loss: 0.1121
+INFO:root:Val acc: 96.52%, Best val acc: 96.52%
+INFO:root:Epoch 29 done, took 106.32s, learning rate: 0.38e-3
+INFO:root:loss: 0.1194, Best train loss: 0.1194
+INFO:root:acc: 96.468%, Best train acc: 96.468%
+INFO:root:Epoch 30 done, took 106.43s, learning rate: 0.38e-3
+INFO:root:loss: 0.1098, Best train loss: 0.1098
+INFO:root:acc: 96.794%, Best train acc: 96.794%
+INFO:root:Val loss: 0.1009, Best val loss: 0.1009
+INFO:root:Val acc: 96.74%, Best val acc: 96.74%
+INFO:root:Epoch 31 done, took 106.12s, learning rate: 0.38e-3
+INFO:root:loss: 0.1111, Best train loss: 0.1098
+INFO:root:acc: 96.757%, Best train acc: 96.794%
+INFO:root:Epoch 32 done, took 106.54s, learning rate: 0.38e-3
+INFO:root:loss: 0.1058, Best train loss: 0.1058
+INFO:root:acc: 96.911%, Best train acc: 96.911%
+INFO:root:Val loss: 0.0948, Best val loss: 0.0948
+INFO:root:Val acc: 97.15%, Best val acc: 97.15%
+INFO:root:Epoch 33 done, took 106.55s, learning rate: 0.38e-3
+INFO:root:loss: 0.1043, Best train loss: 0.1043
+INFO:root:acc: 96.889%, Best train acc: 96.911%
+INFO:root:Epoch 34 done, took 106.43s, learning rate: 0.32e-3
+INFO:root:loss: 0.0998, Best train loss: 0.0998
+INFO:root:acc: 97.079%, Best train acc: 97.079%
+INFO:root:Val loss: 0.0937, Best val loss: 0.0937
+INFO:root:Val acc: 97.17%, Best val acc: 97.17%
+INFO:root:Epoch 35 done, took 106.28s, learning rate: 0.32e-3
+INFO:root:loss: 0.0937, Best train loss: 0.0937
+INFO:root:acc: 97.251%, Best train acc: 97.251%
+INFO:root:Epoch 36 done, took 106.29s, learning rate: 0.32e-3
+INFO:root:loss: 0.0947, Best train loss: 0.0937
+INFO:root:acc: 97.242%, Best train acc: 97.251%
+INFO:root:Val loss: 0.0924, Best val loss: 0.0924
+INFO:root:Val acc: 96.99%, Best val acc: 97.17%
+INFO:root:Epoch 37 done, took 106.21s, learning rate: 0.32e-3
+INFO:root:loss: 0.0922, Best train loss: 0.0922
+INFO:root:acc: 97.349%, Best train acc: 97.349%
+INFO:root:Epoch 38 done, took 106.18s, learning rate: 0.32e-3
+INFO:root:loss: 0.0877, Best train loss: 0.0877
+INFO:root:acc: 97.432%, Best train acc: 97.432%
+INFO:root:Val loss: 0.0970, Best val loss: 0.0924
+INFO:root:Val acc: 97.03%, Best val acc: 97.17%
+INFO:root:Epoch 39 done, took 106.36s, learning rate: 0.27e-3
+INFO:root:loss: 0.0879, Best train loss: 0.0877
+INFO:root:acc: 97.311%, Best train acc: 97.432%
+INFO:root:Epoch 40 done, took 106.34s, learning rate: 0.27e-3
+INFO:root:loss: 0.0845, Best train loss: 0.0845
+INFO:root:acc: 97.504%, Best train acc: 97.504%
+INFO:root:Val loss: 0.0824, Best val loss: 0.0824
+INFO:root:Val acc: 97.66%, Best val acc: 97.66%
+INFO:root:Epoch 41 done, took 106.13s, learning rate: 0.27e-3
+INFO:root:loss: 0.0881, Best train loss: 0.0845
+INFO:root:acc: 97.392%, Best train acc: 97.504%
+INFO:root:Epoch 42 done, took 106.24s, learning rate: 0.27e-3
+INFO:root:loss: 0.0870, Best train loss: 0.0845
+INFO:root:acc: 97.371%, Best train acc: 97.504%
+INFO:root:Val loss: 0.0801, Best val loss: 0.0801
+INFO:root:Val acc: 97.62%, Best val acc: 97.66%
+INFO:root:Epoch 43 done, took 106.11s, learning rate: 0.27e-3
+INFO:root:loss: 0.0821, Best train loss: 0.0821
+INFO:root:acc: 97.508%, Best train acc: 97.508%
+INFO:root:Epoch 44 done, took 106.26s, learning rate: 0.23e-3
+INFO:root:loss: 0.0781, Best train loss: 0.0781
+INFO:root:acc: 97.645%, Best train acc: 97.645%
+INFO:root:Val loss: 0.0736, Best val loss: 0.0736
+INFO:root:Val acc: 97.75%, Best val acc: 97.75%
+INFO:root:Epoch 45 done, took 106.41s, learning rate: 0.23e-3
+INFO:root:loss: 0.0790, Best train loss: 0.0781
+INFO:root:acc: 97.656%, Best train acc: 97.656%
+INFO:root:Epoch 46 done, took 106.35s, learning rate: 0.23e-3
+INFO:root:loss: 0.0748, Best train loss: 0.0748
+INFO:root:acc: 97.770%, Best train acc: 97.770%
+INFO:root:Val loss: 0.0891, Best val loss: 0.0736
+INFO:root:Val acc: 97.32%, Best val acc: 97.75%
+INFO:root:Epoch 47 done, took 106.34s, learning rate: 0.23e-3
+INFO:root:loss: 0.0734, Best train loss: 0.0734
+INFO:root:acc: 97.824%, Best train acc: 97.824%
+INFO:root:Epoch 48 done, took 106.33s, learning rate: 0.23e-3
+INFO:root:loss: 0.0739, Best train loss: 0.0734
+INFO:root:acc: 97.821%, Best train acc: 97.824%
+INFO:root:Val loss: 0.0759, Best val loss: 0.0736
+INFO:root:Val acc: 97.75%, Best val acc: 97.75%
+INFO:root:Epoch 49 done, took 106.26s, learning rate: 0.20e-3
+INFO:root:loss: 0.0723, Best train loss: 0.0723
+INFO:root:acc: 97.866%, Best train acc: 97.866%
+INFO:root:Epoch 50 done, took 106.24s, learning rate: 0.20e-3
+INFO:root:loss: 0.0715, Best train loss: 0.0715
+INFO:root:acc: 97.875%, Best train acc: 97.875%
+INFO:root:Val loss: 0.0795, Best val loss: 0.0736
+INFO:root:Val acc: 97.64%, Best val acc: 97.75%
+INFO:root:Epoch 51 done, took 106.20s, learning rate: 0.20e-3
+INFO:root:loss: 0.0697, Best train loss: 0.0697
+INFO:root:acc: 97.920%, Best train acc: 97.920%
+INFO:root:Epoch 52 done, took 106.40s, learning rate: 0.20e-3
+INFO:root:loss: 0.0699, Best train loss: 0.0697
+INFO:root:acc: 97.900%, Best train acc: 97.920%
+INFO:root:Val loss: 0.0769, Best val loss: 0.0736
+INFO:root:Val acc: 97.71%, Best val acc: 97.75%
+INFO:root:Epoch 53 done, took 106.41s, learning rate: 0.20e-3
+INFO:root:loss: 0.0678, Best train loss: 0.0678
+INFO:root:acc: 97.975%, Best train acc: 97.975%
+INFO:root:Epoch 54 done, took 106.29s, learning rate: 0.17e-3
+INFO:root:loss: 0.0683, Best train loss: 0.0678
+INFO:root:acc: 97.969%, Best train acc: 97.975%
+INFO:root:Val loss: 0.0736, Best val loss: 0.0736
+INFO:root:Val acc: 97.93%, Best val acc: 97.93%
+INFO:root:Epoch 55 done, took 106.29s, learning rate: 0.17e-3
+INFO:root:loss: 0.0672, Best train loss: 0.0672
+INFO:root:acc: 98.049%, Best train acc: 98.049%
+INFO:root:Epoch 56 done, took 106.43s, learning rate: 0.17e-3
+INFO:root:loss: 0.0659, Best train loss: 0.0659
+INFO:root:acc: 98.027%, Best train acc: 98.049%
+INFO:root:Val loss: 0.0671, Best val loss: 0.0671
+INFO:root:Val acc: 97.93%, Best val acc: 97.93%
+INFO:root:Epoch 57 done, took 106.51s, learning rate: 0.17e-3
+INFO:root:loss: 0.0629, Best train loss: 0.0629
+INFO:root:acc: 98.116%, Best train acc: 98.116%
+INFO:root:Epoch 58 done, took 106.76s, learning rate: 0.17e-3
+INFO:root:loss: 0.0629, Best train loss: 0.0629
+INFO:root:acc: 98.141%, Best train acc: 98.141%
+INFO:root:Val loss: 0.0728, Best val loss: 0.0671
+INFO:root:Val acc: 97.79%, Best val acc: 97.93%
+INFO:root:Epoch 59 done, took 106.80s, learning rate: 0.14e-3
+INFO:root:loss: 0.0645, Best train loss: 0.0629
+INFO:root:acc: 98.050%, Best train acc: 98.141%
+INFO:root:Epoch 60 done, took 106.63s, learning rate: 0.14e-3
+INFO:root:loss: 0.0625, Best train loss: 0.0625
+INFO:root:acc: 98.188%, Best train acc: 98.188%
+INFO:root:Val loss: 0.0716, Best val loss: 0.0671
+INFO:root:Val acc: 97.89%, Best val acc: 97.93%
+INFO:root:Epoch 61 done, took 106.81s, learning rate: 0.14e-3
+INFO:root:loss: 0.0617, Best train loss: 0.0617
+INFO:root:acc: 98.188%, Best train acc: 98.188%
+INFO:root:Epoch 62 done, took 106.64s, learning rate: 0.14e-3
+INFO:root:loss: 0.0613, Best train loss: 0.0613
+INFO:root:acc: 98.108%, Best train acc: 98.188%
+INFO:root:Val loss: 0.0703, Best val loss: 0.0671
+INFO:root:Val acc: 98.03%, Best val acc: 98.03%
+INFO:root:Epoch 63 done, took 106.68s, learning rate: 0.14e-3
+INFO:root:loss: 0.0614, Best train loss: 0.0613
+INFO:root:acc: 98.228%, Best train acc: 98.228%
+INFO:root:Epoch 64 done, took 106.44s, learning rate: 0.12e-3
+INFO:root:loss: 0.0587, Best train loss: 0.0587
+INFO:root:acc: 98.258%, Best train acc: 98.258%
+INFO:root:Val loss: 0.0664, Best val loss: 0.0664
+INFO:root:Val acc: 98.09%, Best val acc: 98.09%
+INFO:root:Epoch 65 done, took 106.54s, learning rate: 0.12e-3
+INFO:root:loss: 0.0605, Best train loss: 0.0587
+INFO:root:acc: 98.220%, Best train acc: 98.258%
+INFO:root:Epoch 66 done, took 106.36s, learning rate: 0.12e-3
+INFO:root:loss: 0.0567, Best train loss: 0.0567
+INFO:root:acc: 98.315%, Best train acc: 98.315%
+INFO:root:Val loss: 0.0669, Best val loss: 0.0664
+INFO:root:Val acc: 98.03%, Best val acc: 98.09%
+INFO:root:Epoch 67 done, took 106.40s, learning rate: 0.12e-3
+INFO:root:loss: 0.0582, Best train loss: 0.0567
+INFO:root:acc: 98.219%, Best train acc: 98.315%
+INFO:root:Epoch 68 done, took 106.48s, learning rate: 0.12e-3
+INFO:root:loss: 0.0565, Best train loss: 0.0565
+INFO:root:acc: 98.315%, Best train acc: 98.315%
+INFO:root:Val loss: 0.0675, Best val loss: 0.0664
+INFO:root:Val acc: 97.97%, Best val acc: 98.09%
+INFO:root:Epoch 69 done, took 106.33s, learning rate: 0.10e-3
+INFO:root:loss: 0.0556, Best train loss: 0.0556
+INFO:root:acc: 98.278%, Best train acc: 98.315%
+INFO:root:Epoch 70 done, took 106.42s, learning rate: 0.10e-3
+INFO:root:loss: 0.0549, Best train loss: 0.0549
+INFO:root:acc: 98.343%, Best train acc: 98.343%
+INFO:root:Val loss: 0.0652, Best val loss: 0.0652
+INFO:root:Val acc: 98.24%, Best val acc: 98.24%
+INFO:root:Epoch 71 done, took 106.38s, learning rate: 0.10e-3
+INFO:root:loss: 0.0546, Best train loss: 0.0546
+INFO:root:acc: 98.385%, Best train acc: 98.385%
+INFO:root:Epoch 72 done, took 106.38s, learning rate: 0.10e-3
+INFO:root:loss: 0.0554, Best train loss: 0.0546
+INFO:root:acc: 98.347%, Best train acc: 98.385%
+INFO:root:Val loss: 0.0676, Best val loss: 0.0652
+INFO:root:Val acc: 98.09%, Best val acc: 98.24%
+INFO:root:Epoch 73 done, took 106.31s, learning rate: 0.10e-3
+INFO:root:loss: 0.0555, Best train loss: 0.0546
+INFO:root:acc: 98.363%, Best train acc: 98.385%
+INFO:root:Epoch 74 done, took 106.31s, learning rate: 0.09e-3
+INFO:root:loss: 0.0550, Best train loss: 0.0546
+INFO:root:acc: 98.349%, Best train acc: 98.385%
+INFO:root:Val loss: 0.0693, Best val loss: 0.0652
+INFO:root:Val acc: 98.11%, Best val acc: 98.24%
+INFO:root:Epoch 75 done, took 106.35s, learning rate: 0.09e-3
+INFO:root:loss: 0.0538, Best train loss: 0.0538
+INFO:root:acc: 98.403%, Best train acc: 98.403%
+INFO:root:Epoch 76 done, took 106.30s, learning rate: 0.09e-3
+INFO:root:loss: 0.0528, Best train loss: 0.0528
+INFO:root:acc: 98.432%, Best train acc: 98.432%
+INFO:root:Val loss: 0.0637, Best val loss: 0.0637
+INFO:root:Val acc: 98.24%, Best val acc: 98.24%
+INFO:root:Epoch 77 done, took 106.26s, learning rate: 0.09e-3
+INFO:root:loss: 0.0527, Best train loss: 0.0527
+INFO:root:acc: 98.410%, Best train acc: 98.432%
+INFO:root:Epoch 78 done, took 106.42s, learning rate: 0.09e-3
+INFO:root:loss: 0.0522, Best train loss: 0.0522
+INFO:root:acc: 98.494%, Best train acc: 98.494%
+INFO:root:Val loss: 0.0627, Best val loss: 0.0627
+INFO:root:Val acc: 98.12%, Best val acc: 98.24%
+INFO:root:Epoch 79 done, took 106.29s, learning rate: 0.07e-3
+INFO:root:loss: 0.0514, Best train loss: 0.0514
+INFO:root:acc: 98.481%, Best train acc: 98.494%
+INFO:root:Epoch 80 done, took 106.36s, learning rate: 0.07e-3
+INFO:root:loss: 0.0517, Best train loss: 0.0514
+INFO:root:acc: 98.461%, Best train acc: 98.494%
+INFO:root:Val loss: 0.0637, Best val loss: 0.0627
+INFO:root:Val acc: 98.16%, Best val acc: 98.24%
+INFO:root:Epoch 81 done, took 106.18s, learning rate: 0.07e-3
+INFO:root:loss: 0.0503, Best train loss: 0.0503
+INFO:root:acc: 98.512%, Best train acc: 98.512%
+INFO:root:Epoch 82 done, took 106.48s, learning rate: 0.07e-3
+INFO:root:loss: 0.0501, Best train loss: 0.0501
+INFO:root:acc: 98.517%, Best train acc: 98.517%
+INFO:root:Val loss: 0.0619, Best val loss: 0.0619
+INFO:root:Val acc: 98.24%, Best val acc: 98.24%
+INFO:root:Epoch 83 done, took 106.35s, learning rate: 0.07e-3
+INFO:root:loss: 0.0488, Best train loss: 0.0488
+INFO:root:acc: 98.553%, Best train acc: 98.553%
+INFO:root:Epoch 84 done, took 106.40s, learning rate: 0.06e-3
+INFO:root:loss: 0.0505, Best train loss: 0.0488
+INFO:root:acc: 98.488%, Best train acc: 98.553%
+INFO:root:Val loss: 0.0628, Best val loss: 0.0619
+INFO:root:Val acc: 98.14%, Best val acc: 98.24%
+INFO:root:Epoch 85 done, took 106.45s, learning rate: 0.06e-3
+INFO:root:loss: 0.0489, Best train loss: 0.0488
+INFO:root:acc: 98.562%, Best train acc: 98.562%
+INFO:root:Epoch 86 done, took 106.38s, learning rate: 0.06e-3
+INFO:root:loss: 0.0482, Best train loss: 0.0482
+INFO:root:acc: 98.530%, Best train acc: 98.562%
+INFO:root:Val loss: 0.0644, Best val loss: 0.0619
+INFO:root:Val acc: 98.26%, Best val acc: 98.26%
+INFO:root:Epoch 87 done, took 106.54s, learning rate: 0.06e-3
+INFO:root:loss: 0.0498, Best train loss: 0.0482
+INFO:root:acc: 98.526%, Best train acc: 98.562%
+INFO:root:Epoch 88 done, took 106.52s, learning rate: 0.06e-3
+INFO:root:loss: 0.0485, Best train loss: 0.0482
+INFO:root:acc: 98.559%, Best train acc: 98.562%
+INFO:root:Val loss: 0.0641, Best val loss: 0.0619
+INFO:root:Val acc: 98.22%, Best val acc: 98.26%
+INFO:root:Epoch 89 done, took 106.46s, learning rate: 0.05e-3
+INFO:root:loss: 0.0495, Best train loss: 0.0482
+INFO:root:acc: 98.546%, Best train acc: 98.562%
+INFO:root:Epoch 90 done, took 106.38s, learning rate: 0.05e-3
+INFO:root:loss: 0.0474, Best train loss: 0.0474
+INFO:root:acc: 98.557%, Best train acc: 98.562%
+INFO:root:Val loss: 0.0708, Best val loss: 0.0619
+INFO:root:Val acc: 98.05%, Best val acc: 98.26%
+INFO:root:Epoch 91 done, took 106.44s, learning rate: 0.05e-3
+INFO:root:loss: 0.0472, Best train loss: 0.0472
+INFO:root:acc: 98.588%, Best train acc: 98.588%
+INFO:root:Epoch 92 done, took 106.38s, learning rate: 0.05e-3
+INFO:root:loss: 0.0472, Best train loss: 0.0472
+INFO:root:acc: 98.588%, Best train acc: 98.588%
+INFO:root:Val loss: 0.0623, Best val loss: 0.0619
+INFO:root:Val acc: 98.24%, Best val acc: 98.26%
+INFO:root:Epoch 93 done, took 106.40s, learning rate: 0.05e-3
+INFO:root:loss: 0.0462, Best train loss: 0.0462
+INFO:root:acc: 98.604%, Best train acc: 98.604%
+INFO:root:Epoch 94 done, took 106.37s, learning rate: 0.05e-3
+INFO:root:loss: 0.0468, Best train loss: 0.0462
+INFO:root:acc: 98.604%, Best train acc: 98.604%
+INFO:root:Val loss: 0.0624, Best val loss: 0.0619
+INFO:root:Val acc: 98.22%, Best val acc: 98.26%
+INFO:root:Epoch 95 done, took 106.50s, learning rate: 0.05e-3
+INFO:root:loss: 0.0458, Best train loss: 0.0458
+INFO:root:acc: 98.655%, Best train acc: 98.655%
+INFO:root:Epoch 96 done, took 106.33s, learning rate: 0.05e-3
+INFO:root:loss: 0.0462, Best train loss: 0.0458
+INFO:root:acc: 98.655%, Best train acc: 98.655%
+INFO:root:Val loss: 0.0630, Best val loss: 0.0619
+INFO:root:Val acc: 98.32%, Best val acc: 98.32%
+INFO:root:Epoch 97 done, took 106.27s, learning rate: 0.05e-3
+INFO:root:loss: 0.0461, Best train loss: 0.0458
+INFO:root:acc: 98.613%, Best train acc: 98.655%
+INFO:root:Epoch 98 done, took 106.45s, learning rate: 0.05e-3
+INFO:root:loss: 0.0451, Best train loss: 0.0451
+INFO:root:acc: 98.667%, Best train acc: 98.667%
+INFO:root:Val loss: 0.0612, Best val loss: 0.0612
+INFO:root:Val acc: 98.36%, Best val acc: 98.36%
+INFO:root:Epoch 99 done, took 106.26s, learning rate: 0.04e-3
+INFO:root:loss: 0.0459, Best train loss: 0.0451
+INFO:root:acc: 98.656%, Best train acc: 98.667%
+INFO:root:
+Test loss: 0.0782, Test acc: 98.00%
