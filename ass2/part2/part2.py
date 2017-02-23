@@ -24,15 +24,15 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 128
-BATCH_SIZE_EVAL = 128
+BATCH_SIZE = 2048
+BATCH_SIZE_EVAL = 2048
 nsample = 100
 nsamples = 11
 
-num_epochs = 75
-epochs_per_checkpoint =3
+num_epochs = 100
+epochs_per_checkpoint = 2
 
-from_pretrained_weights = True
+from_pretrained_weights = False
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -179,8 +179,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    5*train_size,                       # Decay step.
-                    0.85,                               # Decay rate.
+                    10*train_size,                       # Decay step.
+                    0.88,                               # Decay rate.
                     staircase=True)
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
@@ -300,7 +300,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:1000]
+    #train_data = train_data[:1000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.model not in models.keys():
