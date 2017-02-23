@@ -154,7 +154,7 @@ def in_painting(model_archi,gt_data,cache_data):
     with tf.Session() as sess:
         print("\nStart testing...")
         #tf.global_variables_initializer().run()
-        csvfileTest = open('Perf/test_' + str(nn_model) + '.csv', 'w')
+        csvfileTest = open('Perf/Xentropy_' + str(nn_model) + '.csv', 'w')
         Testwriter = csv.writer(csvfileTest, delimiter=';',)
         """
         Testwriter.writerow(['Predict CE 300','Grount truth CE 300',

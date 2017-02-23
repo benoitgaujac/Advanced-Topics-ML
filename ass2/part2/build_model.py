@@ -108,9 +108,12 @@ def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
         outputs, state = tf.nn.dynamic_rnn(cells, images_embedded, dtype=part2.data_type()) # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
 
     out = tf.reshape(outputs, [-1,nunits]) #out shape [batch*(IMAGE_SIZE*IMAGE_SIZE),nunits]
+    """
     # Batch normalization
     out_norm = batch_norm(out, nunits, training)
     y = tf.matmul(out_norm,weight_class) + biais_class # y shape: [batch*IMAGE_SIZE*IMAGE_SIZE,1]
+    """
+    y = tf.matmul(out,weight_class) + biais_class # y shape: [batch*IMAGE_SIZE*IMAGE_SIZE,1]
     y_reshape = tf.reshape(y,[-1,IMAGE_SIZE*IMAGE_SIZE]) # y shape: [batch,IMAGE_SIZE*IMAGE_SIZE]
     return y_reshape[:,:-1]
 
@@ -129,14 +132,17 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
         outputs, state = tf.nn.dynamic_rnn(cells, images_embedded,  # outputs shape: [nsamples*batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
                                             dtype=part2.data_type())
     last_out = outputs[:,-1,:] # last_out shape: [nsamples*batch, nunits]
-    # Batch normalization
-    out_norm = batch_norm(last_out, nunits, training)
-    out_norm = tf.matmul(out_norm,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
+    out = tf.matmul(last_out,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
+        """
+        # Batch normalization
+        out_norm = batch_norm(last_out, nunits, training)
+        out_norm = tf.matmul(out_norm,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
+        """
     # sample nsamples pixel values from last output
-    inputs = get_samples(out_norm) # inputs shape [nsamples*batch,1,1]
+    inputs = get_samples(out) # inputs shape [nsamples*batch,1,1]
     # list of pixels predictions and pixels logits
     im_pred = tf.concat(1,[images_embedded,inputs])
-    out_logits = [out_norm,]
+    out_logits = [out,]
     # run the RNN throught the hidden 300 last pixels
     with tf.variable_scope("RNN", reuse=True):
         for i in range(300):
@@ -144,6 +150,10 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
                                         dtype=part2.data_type(),
                                         initial_state=state)
             out = tf.reshape(out,[-1,nunits]) # out shape [nsamples*batch,nunits]
+            """
+            out_norm = batch_norm(out, nunits, training)
+            out_norm = tf.matmul(out_norm,weight_class) + biais_class # out shape: [nsamples*batch,1]
+            """
             out = tf.matmul(out,weight_class) + biais_class # out shape: [nsamples*batch,1]
             out_logits.append(out)
             # sample from bernuolli logits
