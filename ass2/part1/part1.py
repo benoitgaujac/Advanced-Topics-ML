@@ -22,8 +22,8 @@ PIXEL_DEPTH = 255
 NUM_LABELS = 10
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 512
-BATCH_SIZE_EVAL = 512
+BATCH_SIZE = 2048
+BATCH_SIZE_EVAL = 2048
 
 num_epochs = 100
 epochs_per_checkpoint = 2
