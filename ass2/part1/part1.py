@@ -38,7 +38,7 @@ parser.add_option('-s', '--mode', action='store', dest='mode',
     help="testing or training mode")
 
 ######################################## Models architectures ########################################
-lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.006}
+lstm1l32u = {"name": "lstm1l32u", "cell": "LSTM", "layers": 1, "units":32, "init_learning_rate": 0.001}
 lstm1l64u = {"name": "lstm1l64u", "cell": "LSTM", "layers": 1, "units":64, "init_learning_rate": 0.005}
 lstm1l128u = {"name": "lstm1l128u", "cell": "LSTM", "layers": 1, "units":128, "init_learning_rate": 0.003}
 lstm3l32u = {"name": "lstm3l32u", "cell": "LSTM", "layers": 3, "units":32, "init_learning_rate": 0.005}
@@ -173,8 +173,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    5*train_size,                       # Decay step.
-                    0.85,                               # Decay rate.
+                    10*train_size,                       # Decay step.
+                    0.87,                               # Decay rate.
                     staircase=True)
 
     ###### Optimizer ######
