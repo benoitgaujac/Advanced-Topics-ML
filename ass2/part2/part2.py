@@ -159,7 +159,12 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     DST = create_DST_DIT(nn_model)
 
     train_size = train_data.shape[0]
-    print("\nPreparing variables and building model {}...".format(nn_model))
+
+    start_time = time.time()
+    print("")
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    print("Preparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
     data_node = tf.placeholder(dtype=data_type(), shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
 
@@ -188,6 +193,10 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     prediction = tf.sigmoid(logits)
     ###### Saver ######
     saver = tf.train.Saver()
+
+    logging.info("Model {} built, took {}s".format(nn_model,time.localtime()-start_time))
+    print("Model {} built, took {}s".format(nn_model,time.localtime()-start_time))
+
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
         # Training

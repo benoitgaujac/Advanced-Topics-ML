@@ -133,11 +133,11 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
                                             dtype=part2.data_type())
     last_out = outputs[:,-1,:] # last_out shape: [nsamples*batch, nunits]
     out = tf.matmul(last_out,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
-        """
-        # Batch normalization
-        out_norm = batch_norm(last_out, nunits, training)
-        out_norm = tf.matmul(out_norm,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
-        """
+    """
+    # Batch normalization
+    out_norm = batch_norm(last_out, nunits, training)
+    out_norm = tf.matmul(out_norm,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
+    """
     # sample nsamples pixel values from last output
     inputs = get_samples(out) # inputs shape [nsamples*batch,1,1]
     # list of pixels predictions and pixels logits
