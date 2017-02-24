@@ -24,13 +24,13 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 2048
+BATCH_SIZE = 256
 BATCH_SIZE_EVAL = 2048
 nsample = 100
 nsamples = 11
 
-num_epochs = 100
-epochs_per_checkpoint = 2
+num_epochs = 11
+epochs_per_checkpoint = 10
 
 from_pretrained_weights = False
 
@@ -161,10 +161,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     train_size = train_data.shape[0]
 
     start_time = time.time()
-    print("")
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    print("Preparing variables and building model {}...".format(nn_model))
+    print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
     data_node = tf.placeholder(dtype=data_type(), shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
 
@@ -193,9 +190,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     prediction = tf.sigmoid(logits)
     ###### Saver ######
     saver = tf.train.Saver()
-
-    logging.info("Model {} built, took {}s".format(nn_model,time.localtime()-start_time))
-    print("Model {} built, took {}s".format(nn_model,time.localtime()-start_time))
 
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
@@ -309,7 +303,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    #train_data = train_data[:1000]
+    train_data = train_data[:3000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.model not in models.keys():

@@ -126,7 +126,10 @@ def in_painting(model_archi,gt_data,cache_data):
     # get weights path
     DST = create_DST_DIT(nn_model)
 
-    print("\nPreparing variables and building model {}...".format(nn_model))
+    print("")
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    print("Preparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
     test_data_node = tf.placeholder(dtype = part2.data_type(), shape=(np.shape(gt_data)[0], np.shape(gt_data)[1]))
     cache_data_node = tf.placeholder(dtype = part2.data_type(), shape=(np.shape(cache_data)[0], np.shape(cache_data)[1]))
@@ -143,6 +146,9 @@ def in_painting(model_archi,gt_data,cache_data):
     pred_mean_Xentropy, pred_samples_Xentropy = get_loss(logits=test_logits,targets=test_pred)
 
     saver = tf.train.Saver()
+
+    logging.info("Model {} built, took {}s".format(nn_model,time.time()-start_time))
+    print("Model {} built, took {}s".format(nn_model,time.time()-start_time))
 
     """
     vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
