@@ -202,8 +202,8 @@ def main(model_archi,train_data, train_labels, validation_data, validation_label
                 learning_rate = tf.train.exponential_decay(
                                 model_archi["init_learning_rate"],  # Base learning rate.
                                 batch * BATCH_SIZE,                 # Current index into the dataset.
-                                5*train_size,                       # Decay step.
-                                0.85,                               # Decay rate.
+                                10*train_size,                       # Decay step.
+                                0.90,                               # Decay rate.
                                 staircase=True)
             # Training
             # initialize performance indicators
