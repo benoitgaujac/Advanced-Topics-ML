@@ -24,13 +24,13 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 256
+BATCH_SIZE = 2048
 BATCH_SIZE_EVAL = 2048
 nsample = 100
 nsamples = 11
 
-num_epochs = 11
-epochs_per_checkpoint = 10
+num_epochs = 100
+epochs_per_checkpoint = 2
 
 from_pretrained_weights = False
 
@@ -181,8 +181,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     learning_rate = tf.train.exponential_decay(
                     model_archi["init_learning_rate"],  # Base learning rate.
                     batch * BATCH_SIZE,                 # Current index into the dataset.
-                    10*train_size,                       # Decay step.
-                    0.88,                               # Decay rate.
+                    5*train_size,                       # Decay step.
+                    0.90,                               # Decay rate.
                     staircase=True)
     ###### Optimizer ######
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(loss,global_step=batch)
@@ -303,7 +303,7 @@ if __name__ == '__main__':
     # Shuffle train data
     np.random.shuffle(train_data)
 
-    train_data = train_data[:3000]
+    #train_data = train_data[:3000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.model not in models.keys():
