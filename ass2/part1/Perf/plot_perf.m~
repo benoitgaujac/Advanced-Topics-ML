@@ -121,13 +121,13 @@ ylim([0.10 2])
 legend('training accuracy', 'validation accuracy', 'test accuracy', ...
     'training loss', 'validation loss', 'test loss','Location','northeast')
 
-f9 = figure
-plot(epochs,perfs_332{2:end,4},':b',epochs,perfs_332{2:end,6},'b', epochs,one*test_332{1,2},'--b', ...
-    epochs,perfs_332{2:end,3},':r',epochs,perfs_332{2:end,5},'r', epochs,one*test_332{1,1},'--r','LineWidth',.8)
-title('3 layers 32 units LSTM')
+f8 = figure
+plot(epochs,perfs_1128{2:end,4},':b',epochs,perfs_1128{2:end,6},'b', epochs,one*test_1128{1,2},'--b', ...
+    epochs,perfs_1128{2:end,3},':r',epochs,perfs_1128{2:end,5},'r', epochs,one*test_1128{1,1},'--r','LineWidth',.8)
+title('1 layer 128 units LSTM')
 xlabel('epochs') % x-axis label
 ylabel('accuracy(%) / loss') % y-axis label
-ylim([0.20 2])
+ylim([0.10 2])
 legend('training accuracy', 'validation accuracy', 'test accuracy', ...
     'training loss', 'validation loss', 'test loss','Location','northeast')
 
@@ -136,16 +136,16 @@ col1h = [1 0.4 0.4];
 col2h = [1 0.6 0.];
 colConv1 = [0.2 0.4 1.0];
 
-f10 = figure
-plot(epochs,perfs_132{2:end,3},':',epochs,perfs_132{2:end,5},'color',col1l,'LineWidth',.8) 
+f5 = figure
+plot(epochs,perfs_1L{2:end,3},':',epochs,perfs_1L{2:end,5},'color',col1l,'LineWidth',.8) 
 title('Loss models comparison')
 xlabel('epochs') % x-axis label
 ylabel('loss') % y-axis label
-ylim([0.15 2.3])
+ylim([0.0 1.4])
 hold on;
-plot(epochs,perfs_164{2:end,3},':',epochs,perfs_164{2:end,5},'color',col1h,'LineWidth',.8)
+plot(epochs,perfs_1H{2:end,3},':',epochs,perfs_1H{2:end,5},'color',col1h,'LineWidth',.8)
 hold on;
-plot(epochs,perfs_1128{2:end,3},':',epochs,perfs_1128{2:end,5},'color',col2h,'LineWidth',.8)
+plot(epochs,perfs_2H{2:end,3},':',epochs,perfs_2H{2:end,5},'color',col2h,'LineWidth',.8)
 hold on;
-plot(epochs,perfs_332{2:end,3},':',epochs,perfs_332{2:end,5},'color',colConv1,'LineWidth',.8)
+plot(epochs(1:79),perfs_Conv1{2:end,3},':',epochs(1:79),perfs_Conv1{2:end,5},'color',colConv1,'LineWidth',.8)
 hold off;

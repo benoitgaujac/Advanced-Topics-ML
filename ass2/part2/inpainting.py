@@ -128,7 +128,7 @@ def in_painting(model_archi,gt_data,cache_data):
 
     print("")
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    start_time = time.time()
     print("Preparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
     test_data_node = tf.placeholder(dtype = part2.data_type(), shape=(np.shape(gt_data)[0], np.shape(gt_data)[1]))
@@ -147,8 +147,7 @@ def in_painting(model_archi,gt_data,cache_data):
 
     saver = tf.train.Saver()
 
-    logging.info("Model {} built, took {}s".format(nn_model,time.time()-start_time))
-    print("Model {} built, took {}s".format(nn_model,time.time()-start_time))
+    print("Model {} built, took {:.4f}s".format(nn_model,time.time()-start_time))
 
     """
     vars_ =  tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
