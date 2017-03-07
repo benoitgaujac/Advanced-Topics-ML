@@ -16,7 +16,6 @@ IMAGE_SIZE = 28
 NUM_CHANNELS = 1
 NUM_LABELS = 1
 SEED = 66478  # Set to None for random seed.
-#fully_connected_neurons = 256
 keep_prob = .75
 
 ######################################## Utils functions ########################################
@@ -50,29 +49,6 @@ def base_cell(cell_type="LSTM", nlayers=1, nunits=32, training=False):
         cells = simple_cell
     return cells
 
-def batch_norm(x, n_out, phase_train):
-    beta = tf.get_variable(name="beta",shape=[n_out], dtype = part2.data_type(),
-                                initializer=tf.constant_initializer(0.0),)
-    gamma = tf.get_variable(name="gamma",shape=[n_out], dtype = part2.data_type(),
-                                initializer=tf.constant_initializer(0.0))
-    batch_mean, batch_var = tf.nn.moments(x, [0], name='moments')
-    ema = tf.train.ExponentialMovingAverage(decay=0.5)
-
-    def mean_var_with_update():
-        ema_apply_op = ema.apply([batch_mean, batch_var])
-        with tf.control_dependencies([ema_apply_op]):
-            return tf.identity(batch_mean), tf.identity(batch_var)
-    def mean_var_no_update():
-        return ema.average(batch_mean), ema.average(batch_var)
-
-    mean, var = tf.cond(phase_train,
-                    mean_var_with_update,
-                    mean_var_no_update)
-
-    normed = tf.nn.batch_normalization(x, mean, var, beta, gamma, 1e-3)
-    return normed
-
-# Sample pixel values from logits
 def get_samples(logits):
     logits_shape = logits.get_shape().as_list()
     log = tf.reshape(logits,[-1,nsamples,1])
@@ -86,13 +62,11 @@ def get_samples(logits):
     # Concat samples
     samples = tf.concat(1,[mostprobable_samples,bernoulli_samples])
     samples = tf.reshape(samples,[logits_shape[0],logits_shape[1],1])
-
     return samples # reshaping to [nsamples*batch,1,1]
 
 def get_mostprobable_sample(logits):
     proba = tf.sigmoid(logits)
     samples = tf.round(proba)
-
     return tf.reshape(samples,[-1,1,1]) # reshaping to [nsamples*batch,1,1]
 
 ######################################## Model ########################################
@@ -106,13 +80,7 @@ def model(x, name, cell="LSTM", nlayers=1, nunits=32, training=False):
         weight_class = weight_variable([nunits,NUM_LABELS],name,"class")
         biais_class = bias_variable([NUM_LABELS],name,"class")
         outputs, state = tf.nn.dynamic_rnn(cells, images_embedded, dtype=part2.data_type()) # outputs shape: [batch,IMAGE_SIZE * IMAGE_SIZE,nunits]
-
     out = tf.reshape(outputs, [-1,nunits]) #out shape [batch*(IMAGE_SIZE*IMAGE_SIZE),nunits]
-    """
-    # Batch normalization
-    out_norm = batch_norm(out, nunits, training)
-    y = tf.matmul(out_norm,weight_class) + biais_class # y shape: [batch*IMAGE_SIZE*IMAGE_SIZE,1]
-    """
     y = tf.matmul(out,weight_class) + biais_class # y shape: [batch*IMAGE_SIZE*IMAGE_SIZE,1]
     y_reshape = tf.reshape(y,[-1,IMAGE_SIZE*IMAGE_SIZE]) # y shape: [batch,IMAGE_SIZE*IMAGE_SIZE]
     return y_reshape[:,:-1]
@@ -133,11 +101,6 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
                                             dtype=part2.data_type())
     last_out = outputs[:,-1,:] # last_out shape: [nsamples*batch, nunits]
     out = tf.matmul(last_out,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
-    """
-    # Batch normalization
-    out_norm = batch_norm(last_out, nunits, training)
-    out_norm = tf.matmul(out_norm,weight_class) + biais_class # last_out shape: [nsamples*batch, 1]
-    """
     # sample nsamples pixel values from last output
     inputs = get_samples(out) # inputs shape [nsamples*batch,1,1]
     # list of pixels predictions and pixels logits
@@ -150,10 +113,6 @@ def model_inpainting(x, name, cell="LSTM", nlayers=1, nunits=32, nsamples=10, tr
                                         dtype=part2.data_type(),
                                         initial_state=state)
             out = tf.reshape(out,[-1,nunits]) # out shape [nsamples*batch,nunits]
-            """
-            out_norm = batch_norm(out, nunits, training)
-            out_norm = tf.matmul(out_norm,weight_class) + biais_class # out shape: [nsamples*batch,1]
-            """
             out = tf.matmul(out,weight_class) + biais_class # out shape: [nsamples*batch,1]
             out_logits.append(out)
             # sample from bernuolli logits

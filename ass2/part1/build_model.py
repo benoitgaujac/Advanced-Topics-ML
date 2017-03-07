@@ -38,8 +38,8 @@ def base_cell(cell_type="LSTM", nlayers=1, nunits=32, training=False):
     dropout_testing = tf.constant(1.0)
     dropout_prob = tf.select(training,dropout_training,dropout_testing)
     simple_cell = tf.nn.rnn_cell.DropoutWrapper(simple_cell,
-                                            input_keep_prob=1,
-                                            output_keep_prob=dropout_prob)
+                                                input_keep_prob=1,
+                                                output_keep_prob=dropout_prob)
     # Stack Cells if needed
     if nlayers>1:
         cells = tf.nn.rnn_cell.MultiRNNCell([simple_cell] * nlayers)

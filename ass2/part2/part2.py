@@ -24,7 +24,7 @@ NUM_CHANNELS = 1
 PIXEL_DEPTH = 255
 VALIDATION_SIZE = 5000  # Size of the validation set.
 SEED = 66478  # Set to None for random seed.
-BATCH_SIZE = 2048
+BATCH_SIZE = 256
 BATCH_SIZE_EVAL = 2048
 nsample = 100
 nsamples = 11
@@ -37,9 +37,9 @@ from_pretrained_weights = False
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option('-m', '--model', action='store', dest='model',
-    help="NN models in {Onelinear,OneHidden,TwoHidden,Conv1}")
+    help="NN models in {gru1l32u, gru1l64u, gru1l128u, gru3l32u}")
 parser.add_option('-s', '--mode', action='store', dest='mode',
-    help="train, test or inpainting mode")
+    help="running mode in {train, test, inpainting} ")
 
 ######################################## Models architectures ########################################
 gru1l32u = {"name": "gru1l32u", "cell": "GRU", "layers": 1, "units":32, "init_learning_rate": 0.01}
@@ -49,9 +49,6 @@ gru3l32u = {"name": "gru3l32u", "cell": "GRU", "layers": 3, "units":32, "init_le
 
 models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
         "gru1l128u": gru1l128u, "gru3l32u": gru3l32u}
-
-#models = {"gru1l32u":gru1l32u, "gru1l64u":gru1l64u,
-#        "gru1l128u": gru1l128u}
 
 ######################################## Data processing ########################################
 def data_type():
@@ -103,20 +100,29 @@ def get_data():
     train_labels = extract_labels(train_labels_filename, 60000)
     test_data = extract_data(test_data_filename, 10000)
     test_labels = extract_labels(test_labels_filename, 10000)
-
     # Generate a validation set.
     validation_data = train_data[:VALIDATION_SIZE, ...]
     validation_labels = train_labels[:VALIDATION_SIZE]
     train_data = train_data[VALIDATION_SIZE:, ...]
     train_labels = train_labels[VALIDATION_SIZE:]
-
     return train_data, train_labels, validation_data, validation_labels, test_data, test_labels
 
 def get_cache_data_set(data,nsample=100):
     data_shape = np.shape(data)
-    idx = np.random.randint(0,data_shape[0],nsample)
+    idx = np.arange(0,data_shape[0],int(data_shape[0]/nsample),dtype="int32")
     samples = data[idx]
     return samples[:,:-300], idx
+
+def get_batches(images, batch_size=BATCH_SIZE):
+    batches = []
+    X = shuffle(images)
+    for i in range(int(X.shape[0]/batch_size)+1):
+        if i<int(X.shape[0]/batch_size):
+            X_batch = X[i * batch_size: (i + 1) * batch_size]
+        else:
+            X_batch = X[-batch_size:]
+        batches.append(X_batch)
+    return batches
 
 ######################################## Utils functions ########################################
 def accuracy(predictions,labels):
@@ -141,30 +147,17 @@ def create_DST_DIT(name_model):
     DST = os.path.join(SUB_DIR,NAME)
     return DST
 
-def get_batches(images, batch_size=BATCH_SIZE):
-    batches = []
-    X = shuffle(images)
-    for i in range(int(X.shape[0]/batch_size)+1):
-        if i<int(X.shape[0]/batch_size):
-            X_batch = X[i * batch_size: (i + 1) * batch_size]
-        else:
-            X_batch = X[-batch_size:]
-        batches.append(X_batch)
-    return batches
-
 ######################################## Main ########################################
 def main(model_archi,train_data, validation_data, test_data, mode_):
     nn_model = model_archi["name"]
+    train_size = train_data.shape[0]
     # Create weights DST dir
     DST = create_DST_DIT(nn_model)
-
-    train_size = train_data.shape[0]
 
     start_time = time.time()
     print("\nPreparing variables and building model {}...".format(nn_model))
     ###### Create tf placeholder ######
     data_node = tf.placeholder(dtype=data_type(), shape=(None, IMAGE_SIZE*IMAGE_SIZE*NUM_CHANNELS))
-
     ###### Build model and loss ######
     phase_train = tf.placeholder(tf.bool, name='phase_train')
     logits = build_model.model(data_node,   name=nn_model,
@@ -190,7 +183,6 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
     prediction = tf.sigmoid(logits)
     ###### Saver ######
     saver = tf.train.Saver()
-
     ###### Create a local session to run the training ######
     with tf.Session() as sess:
         # Training
@@ -210,7 +202,7 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                                 model_archi["init_learning_rate"],  # Base learning rate.
                                 batch * BATCH_SIZE,                 # Current index into the dataset.
                                 5*train_size,                       # Decay step.
-                                0.85,                               # Decay rate.
+                                0.90,                               # Decay rate.
                                 staircase=True)
             # initialize performance indicators
             loss_history = [10000.0,]
@@ -253,8 +245,8 @@ def main(model_archi,train_data, validation_data, test_data, mode_):
                         ev_loss, ev_pred = sess.run([loss, prediction], feed_dict={
                                                                 data_node: eval_batch,
                                                                 phase_train: False})
-                        eval_loss_ += ev_loss / len(eval_Batches)
-                        eval_acc += accuracy_logistic(ev_pred,eval_batch[:,1:]) / len(eval_Batches)
+                        eval_loss_ += ev_loss/len(eval_Batches)
+                        eval_acc += accuracy_logistic(ev_pred,eval_batch[:,1:])/len(eval_Batches)
                     if eval_acc>best_eval_acc:
                         best_eval_acc = eval_acc
                         saver.save(sess,DST)
@@ -300,18 +292,18 @@ if __name__ == '__main__':
     train_data = binarize(train_data)
     validation_data = binarize(validation_data)
     test_data = binarize(test_data)
-    # Shuffle train data
-    np.random.shuffle(train_data)
-
-    #train_data = train_data[:3000]
 
     options, arguments = parser.parse_args(sys.argv)
     if options.model not in models.keys():
         raise Exception("Invalide model name")
     else:
-        if options.mode!="inpainting":
+        if options.mode=="test" or options.mode=="train":
+            # Shuffle train data
+            np.random.shuffle(train_data)
             main(models[options.model],train_data, validation_data, test_data, options.mode)
-        else:
+        elif options.mode=="inpainting":
             # pixel in-painting
             cache_data, idx = get_cache_data_set(test_data,nsample=nsample)
             inpainting.in_painting(models[options.model],test_data[idx],cache_data)
+        else:
+            raise Exception("Invalide mode")
