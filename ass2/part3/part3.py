@@ -109,9 +109,9 @@ def save_images(images,nproposals):
     data_shape = np.shape(images) #shape: [nbtodraw, 28, 28, 3]
     for i in range(data_shape[0]):
         if nproposals>2:
-            DIR_NAME = "./inpainting_p3/2x2"
+            DIR_NAME = "./inpainting/2x2"
         else:
-            DIR_NAME = "./inpainting_p3/1x1"
+            DIR_NAME = "./inpainting/1x1"
         if not tf.gfile.Exists(DIR_NAME):
             tf.gfile.MkDir(DIR_NAME)
         FILE_NAME = "example_" + str(i) + ".png"
@@ -170,9 +170,9 @@ def main(originals, missings, proposals, nproposals):
                                                     phase_train: False})
         print("Testing done, took: {:.4f}s".format(time.time()-start_time))
         # Save Xentropy
-        FILE_NAME = "Perf_p3/GT_" + str(int(np.log(nproposals)/np.log(2))) + ".mat"
+        FILE_NAME = "Perf/GT_" + str(int(np.log(nproposals)/np.log(2))) + ".mat"
         scipy.io.savemat(FILE_NAME, {'mat':results[0]})
-        FILE_NAME = "Perf_p3/PR_" + str(int(np.log(nproposals)/np.log(2))) + ".mat"
+        FILE_NAME = "Perf/PR_" + str(int(np.log(nproposals)/np.log(2))) + ".mat"
         scipy.io.savemat(FILE_NAME, {'mat':results[1]})
 
         # in painting images and save
