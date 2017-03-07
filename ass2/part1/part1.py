@@ -33,7 +33,7 @@ from_pretrained_weights = False
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option('-m', '--model', action='store', dest='model',
-    help="NN models in {Onelinear,OneHidden,TwoHidden,Conv1}")
+    help="NN models in {lstm1l32u, lstm1l64u, lstm1l128u, lstm3l32u, gru1l32u, gru1l64u, gru1l128u, gru3l32u}")
 parser.add_option('-s', '--mode', action='store', dest='mode',
     help="running mode in {train, test} ")
 
