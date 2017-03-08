@@ -3,10 +3,13 @@
 # UCL
 
 # Set up
-Three folders part1, part2 and part3 corresponding to different task of assignment.
+Three folders codes, data and trained_models.
+- codes folder contains the scripts for each parts, in subfolders part1, part2 and part3.
+- data contains the data.
+- trained_models contains the weights for the trained models. 3 subfolders part1, part2 and part3 corresponding to each parts of the assignment. In each of these subfolders, trained weights are ordered by models in subsubfolders named after the models. Moreover, for parts 2 and 3, the subsubfolders contain also the resulting in-painting images. In the subfolders, we also find a Perf folder containing the training and testing performances of the models.
+ 
 
 #### part1 ####:
-Need to create manually part1/Perf folder in part1 repository.
 # Usage:
 part1 [-m <flag>] [-s <flag>]
 Options:
@@ -14,7 +17,6 @@ Options:
 -s <flag> --mode <flag>:  a flag for running mode in ["train", "test”]
 
 #### part2 ####:
-Need to create manually part2/Perf folder in part2 repository.
 # Usage:
 part2 [-m <flag>] [-s <flag>]
 Options:
@@ -22,7 +24,6 @@ Options:
 -s <flag> --mode <flag>:  a flag for running mode in ["train", "test", “inpainting”]
 
 #### part3 ####:
-Need to create manually part3/Perf folder in part2 repository and to create and save datasets in part3/missing_pixels repo. 
 # Usage:
 part3 [-d <flag>]
 Options:
